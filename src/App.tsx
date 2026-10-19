@@ -326,37 +326,38 @@ export function App() {
 
   return (
     <div className="app-container">
-      {/* ============ VISÃO PÚBLICA DO CLIENTE (sempre visível) ============ */}
-      <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
-        <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
-          <div className="public-view-card" style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '2rem',
-            boxShadow: 'var(--shadow-lg)',
-            marginBottom: '2rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-              <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: '10px', color: 'var(--primary)' }}>
-                <Globe size={22} />
+      {!isAdminAuthenticated ? (
+        <>
+        /* ============ VISÃO PÚBLICA DO CLIENTE (sem login) ============ */
+        <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
+            <div className="public-view-card" style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '2rem',
+              boxShadow: 'var(--shadow-lg)',
+              marginBottom: '2rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: '10px', color: 'var(--primary)' }}>
+                  <Globe size={22} />
+                </div>
+                <div>
+                  <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, fontFamily: 'var(--font-serif)' }}>
+                    Agendamento Online
+                  </h1>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.25rem' }}>
+                    Página pública da cliente - agende sem acesso ao painel administrativo
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, fontFamily: 'var(--font-serif)' }}>
-                  Agendamento Online
-                </h1>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.25rem' }}>
-                  Página pública da cliente - agende sem acesso ao painel administrativo
-                </p>
-              </div>
+              <OnlineBookingView
+                services={services}
+                onAppointmentBooked={handleSaveAppointment}
+              />
             </div>
-            <OnlineBookingView
-              services={services}
-              onAppointmentBooked={handleSaveAppointment}
-            />
-          </div>
 
-          {!isAdminAuthenticated && (
             <div style={{ textAlign: 'center' }}>
               <button
                 onClick={() => {
@@ -384,32 +385,31 @@ export function App() {
                 Acessar Painel Administrativo
               </button>
             </div>
-          )}
+          </div>
         </div>
-      </div>
 
-      {/* Login como popup sobre a visão pública */}
-      {isLoginModalOpen && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 2000,
-          background: 'rgba(0,0,0,0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <LoginView
-            onLogin={() => {
-              setIsAdminAuthenticated(true);
-              setIsLoginModalOpen(false);
-            }}
-          />
-        </div>
-      )}
-
-      {/* ============ PAINEL ADMINISTRATIVO (após login) ============ */}
-      {isAdminAuthenticated && (
+        {/* Login como popup sobre a visão pública */}
+        {isLoginModalOpen && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2000,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <LoginView
+              onLogin={() => {
+                setIsAdminAuthenticated(true);
+                setIsLoginModalOpen(false);
+              }}
+            />
+          </div>
+        )}
+        </>
+      ) : (
+        /* ============ PAINEL ADMINISTRATIVO (após login) ============ */
         <>
           <Sidebar
             activeTab={activeTab}
