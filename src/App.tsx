@@ -89,16 +89,22 @@ export function App() {
 
   // Sync from Supabase on mount or when connected
   const syncWithSupabase = useCallback(async () => {
-    if (!isSupabaseConnected()) return;
+    if (!isSupabaseConnected()) {
+      setToast({ message: 'Supabase nao conectado. Configure em Configuracoes.', type: 'error' });
+      return;
+    }
     try {
       const data = await syncFromSupabase();
       if (data) {
-        if (data.clients && data.clients.length > 0) setClients(data.clients);
         if (data.services && data.services.length > 0) setServices(data.services);
+        if (data.clients && data.clients.length > 0) setClients(data.clients);
         if (data.appointments && data.appointments.length > 0) setAppointments(data.appointments);
-        if (data.transactions && data.transactions.length > 0) setTransactions(data.transactions);
+        setToast({ message: 'Dados sincronizados com o banco de dados', type: 'success' });
+      } else {
+        setToast({ message: 'Nenhum dado encontrado no banco', type: 'error' });
       }
     } catch (err) {
+      setToast({ message: 'Erro ao sincronizar com o banco', type: 'error' });
       console.warn('Erro ao carregar dados do Supabase:', err);
     }
   }, []);
@@ -420,6 +426,7 @@ export function App() {
               onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
               onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
               onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+              onForceSync={syncWithSupabase}
               onLogout={handleAdminLogout}
               isSupabaseConnected={hasSupabase}
               isAdminAuthenticated={isAdminAuthenticated}

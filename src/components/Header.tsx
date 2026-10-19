@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Plus, Calendar, Globe, Database, LogOut } from 'lucide-react';
+import { Menu, Plus, Calendar, Globe, Database, LogOut, RefreshCw } from 'lucide-react';
 import type { ActiveTab } from '../types';
 
 interface HeaderProps {
@@ -8,6 +8,7 @@ interface HeaderProps {
   onOpenNewAppointment: () => void;
   onOpenOnlineBooking: () => void;
   onOpenSupabaseConfig: () => void;
+  onForceSync: () => void;
   onLogout: () => void;
   isSupabaseConnected: boolean;
   isAdminAuthenticated: boolean;
@@ -46,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewAppointment,
   onOpenOnlineBooking,
   onOpenSupabaseConfig,
+  onForceSync,
   onLogout,
   isSupabaseConnected,
   isAdminAuthenticated
@@ -110,6 +112,26 @@ export const Header: React.FC<HeaderProps> = ({
           <Database size={15} />
           <span>{isSupabaseConnected ? 'Supabase Conectado' : 'Conectar Supabase'}</span>
         </button>
+
+        {isSupabaseConnected && (
+          <button
+            className="btn btn-secondary"
+            onClick={onForceSync}
+            style={{
+              fontSize: '0.825rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              border: '1px solid #c8e6c9',
+              background: '#f1f8e9',
+              color: '#2e7d32'
+            }}
+            title="Sincronizar com o Banco de Dados"
+          >
+            <RefreshCw size={15} />
+            <span>Sincronizar Banco</span>
+          </button>
+        )}
 
         {activeTab !== 'agendamento_online' && (
           <button

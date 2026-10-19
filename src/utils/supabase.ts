@@ -181,6 +181,7 @@ export const syncUpsertService = async (serviceData: Service): Promise<{ ok: boo
   }
   try {
     await client.from('servicos').upsert({
+      id: serviceData.id,
       nome: serviceData.name,
       preco: serviceData.price,
       duracao_minutos: serviceData.durationMinutes,
