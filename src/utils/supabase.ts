@@ -181,7 +181,8 @@ export const syncUpsertService = async (serviceData: Service) => {
       nome: serviceData.name,
       preco: serviceData.price,
       duracao_minutos: serviceData.durationMinutes,
-      ativo: true
+      ativo: true,
+      image_url: serviceData.imageUrl || null
     });
   } catch (err) {
     console.error('Falha ao salvar servico no Supabase:', err);

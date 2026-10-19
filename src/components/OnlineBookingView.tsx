@@ -284,20 +284,39 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                             transition: 'all 0.15s ease'
                           }}
                         >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{srv.name}</span>
-                              {srv.badge && (
-                                <span className="badge badge-gold" style={{ fontSize: '0.65rem' }}>
-                                  {srv.badge}
-                                </span>
-                              )}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                              {srv.description}
-                            </div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: '0.25rem' }}>
-                              ⏱️ Duração estimada: {srv.durationMinutes} minutos
+                          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', minWidth: '0' }}>
+                            {srv.imageUrl && (
+                              <div style={{
+                                width: '60px',
+                                height: '60px',
+                                borderRadius: 'var(--radius-sm)',
+                                overflow: 'hidden',
+                                border: '1.5px solid var(--border-color)',
+                                flexShrink: 0,
+                                background: 'var(--surface-alt)'
+                              }}>
+                                <img
+                                  src={srv.imageUrl}
+                                  alt={srv.name}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              </div>
+                            )}
+                            <div style={{ minWidth: '0', flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{srv.name}</span>
+                                {srv.badge && (
+                                  <span className="badge badge-gold" style={{ fontSize: '0.65rem' }}>
+                                    {srv.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                                {srv.description}
+                              </div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: '0.25rem' }}>
+                                ⏱️ Duração estimada: {srv.durationMinutes} minutos
+                              </div>
                             </div>
                           </div>
 
