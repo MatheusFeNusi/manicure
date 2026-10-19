@@ -31,6 +31,7 @@ export interface Service {
   description: string;
   badge?: 'Mais Pedido' | 'Tendência' | 'Especial' | 'Novo';
   icon?: string;
+  imageUrl?: string;
 }
 
 export type AppointmentStatus = 

@@ -103,6 +103,11 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             <div key={srv.id} className="service-card">
               <div>
                 <div className="service-card-top">
+                  {srv.imageUrl && (
+                    <div className="service-image-wrapper">
+                      <img src={srv.imageUrl} alt={srv.name} className="service-image" />
+                    </div>
+                  )}
                   <span className="service-category-tag">{srv.category}</span>
                   {srv.badge && (
                     <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>

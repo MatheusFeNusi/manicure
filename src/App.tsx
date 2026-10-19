@@ -30,6 +30,7 @@ import type {
   ActiveTab, 
   AppointmentStatus 
 } from './types';
+import { Globe, Lock } from 'lucide-react';
 
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -45,6 +46,7 @@ import { NewClientModal } from './components/NewClientModal';
 import { NewServiceModal } from './components/NewServiceModal';
 import { NewTransactionModal } from './components/NewTransactionModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
+import { LoginView } from './components/LoginView';
 import './App.css';
 
 export function App() {
@@ -57,6 +59,24 @@ export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasSupabase, setHasSupabase] = useState(isSupabaseConnected());
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('bellanail_admin_auth');
+    if (stored === 'true') {
+      setIsAdminAuthenticated(true);
+    }
+  }, []);
+
+  const handleAdminLogin = () => {
+    setIsAdminAuthenticated(true);
+  };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('bellanail_admin_auth');
+    setIsAdminAuthenticated(false);
+    setActiveTab('agendamento_online');
+  };
 
   // Modals state
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
@@ -284,151 +304,216 @@ export function App() {
 
   return (
     <div className="app-container">
-      {/* Sidebar Navigation */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        todayAppointmentsCount={todayAppointmentsCount}
-      />
+      {!isAdminAuthenticated ? (
+        /* ============ VISTA PÚBLICA DO CLIENTE (sem login) ============ */
+        <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
+            <div style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '2rem',
+              boxShadow: 'var(--shadow-lg)',
+              marginBottom: '2rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: '10px', color: 'var(--primary)' }}>
+                  <Globe size={22} />
+                </div>
+                <div>
+                  <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, fontFamily: 'var(--font-serif)' }}>
+                    Agendamento Online
+                  </h1>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.25rem' }}>
+                    Página pública da cliente - agende sem acesso ao painel administrativo
+                  </p>
+                </div>
+              </div>
+              <OnlineBookingView
+                services={services}
+                onAppointmentBooked={handleSaveAppointment}
+              />
+            </div>
 
-      {/* Main Content Area */}
-      <div className="main-wrapper">
-        <Header
-          activeTab={activeTab}
-          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
-          onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
-          onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
-          onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
-          isSupabaseConnected={hasSupabase}
-        />
+            <div style={{ textAlign: 'center' }}>
+              <button
+                onClick={() => {
+                  setIsServiceModalOpen(false);
+                  setIsAppointmentModalOpen(false);
+                }}
+                className="btn btn-secondary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: 700,
+                  border: '1px solid var(--primary)',
+                  color: 'var(--primary)',
+                  background: 'transparent',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: 'var(--radius-md)'
+                }}
+              >
+                <Lock size={18} style={{ marginRight: '0.4rem' }} />
+                Acessar Painel Administrativo
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* ============ PAINEL ADMINISTRATIVO (requer login) ============ */
+        <>
+          <Sidebar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+            todayAppointmentsCount={todayAppointmentsCount}
+          />
 
-        <main className="content-body">
-          {activeTab === 'dashboard' && (
-            <DashboardView
-              appointments={appointments}
-              clients={clients}
-              services={services}
-              transactions={transactions}
+          <div className="main-wrapper">
+            <Header
+              activeTab={activeTab}
+              onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
               onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
-              onOpenNewClient={() => {
-                setClientToEdit(null);
-                setIsClientModalOpen(true);
-              }}
-              onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
-              onUpdateAppointmentStatus={handleUpdateAppointmentStatus}
-              onSelectTab={setActiveTab}
+              onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
+              onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+              onLogout={handleAdminLogout}
+              isSupabaseConnected={hasSupabase}
+              isAdminAuthenticated={isAdminAuthenticated}
             />
+
+            <main className="content-body">
+              {activeTab === 'dashboard' && (
+                <DashboardView
+                  appointments={appointments}
+                  clients={clients}
+                  services={services}
+                  transactions={transactions}
+                  onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
+                  onOpenNewClient={() => {
+                    setClientToEdit(null);
+                    setIsClientModalOpen(true);
+                  }}
+                  onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
+                  onUpdateAppointmentStatus={handleUpdateAppointmentStatus}
+                  onSelectTab={setActiveTab}
+                />
+              )}
+
+              {activeTab === 'agenda' && (
+                <AgendaView
+                  appointments={appointments}
+                  clients={clients}
+                  services={services}
+                  onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
+                  onUpdateStatus={handleUpdateAppointmentStatus}
+                  onTogglePaymentStatus={handleTogglePaymentStatus}
+                  onDeleteAppointment={handleDeleteAppointment}
+                />
+              )}
+
+              {activeTab === 'servicos' && (
+                <ServicesView
+                  services={services}
+                  onOpenNewService={() => {
+                    setServiceToEdit(null);
+                    setIsServiceModalOpen(true);
+                  }}
+                  onEditService={srv => {
+                    setServiceToEdit(srv);
+                    setIsServiceModalOpen(true);
+                  }}
+                  onDeleteService={handleDeleteService}
+                />
+              )}
+
+              {activeTab === 'clientes' && (
+                <ClientsView
+                  clients={clients}
+                  onOpenNewClient={() => {
+                    setClientToEdit(null);
+                    setIsClientModalOpen(true);
+                  }}
+                  onEditClient={client => {
+                    setClientToEdit(client);
+                    setIsClientModalOpen(true);
+                  }}
+                  onDeleteClient={handleDeleteClient}
+                  onScheduleForClient={_client => {
+                    setIsAppointmentModalOpen(true);
+                  }}
+                />
+              )}
+
+              {activeTab === 'financeiro' && (
+                <FinanceView
+                  transactions={transactions}
+                  onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
+                  onDeleteTransaction={handleDeleteTransaction}
+                />
+              )}
+
+              {activeTab === 'agendamento_online' && (
+                <OnlineBookingView
+                  services={services}
+                  onAppointmentBooked={apt => {
+                    handleSaveAppointment(apt);
+                  }}
+                />
+              )}
+            </main>
+          </div>
+
+          {isAdminAuthenticated && (
+            <LoginView onLogin={handleAdminLogin} />
           )}
 
-          {activeTab === 'agenda' && (
-            <AgendaView
-              appointments={appointments}
-              clients={clients}
-              services={services}
-              onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
-              onUpdateStatus={handleUpdateAppointmentStatus}
-              onTogglePaymentStatus={handleTogglePaymentStatus}
-              onDeleteAppointment={handleDeleteAppointment}
-            />
-          )}
+          {/* Modals */}
+          <NewAppointmentModal
+            isOpen={isAppointmentModalOpen}
+            onClose={() => setIsAppointmentModalOpen(false)}
+            onSave={handleSaveAppointment}
+            clients={clients}
+            services={services}
+          />
 
-          {activeTab === 'servicos' && (
-            <ServicesView
-              services={services}
-              onOpenNewService={() => {
-                setServiceToEdit(null);
-                setIsServiceModalOpen(true);
-              }}
-              onEditService={srv => {
-                setServiceToEdit(srv);
-                setIsServiceModalOpen(true);
-              }}
-              onDeleteService={handleDeleteService}
-            />
-          )}
+          <NewClientModal
+            isOpen={isClientModalOpen}
+            onClose={() => {
+              setIsClientModalOpen(false);
+              setClientToEdit(null);
+            }}
+            onSave={handleSaveClient}
+            initialData={clientToEdit}
+          />
 
-          {activeTab === 'clientes' && (
-            <ClientsView
-              clients={clients}
-              onOpenNewClient={() => {
-                setClientToEdit(null);
-                setIsClientModalOpen(true);
-              }}
-              onEditClient={client => {
-                setClientToEdit(client);
-                setIsClientModalOpen(true);
-              }}
-              onDeleteClient={handleDeleteClient}
-              onScheduleForClient={_client => {
-                setIsAppointmentModalOpen(true);
-              }}
-            />
-          )}
+          <NewServiceModal
+            isOpen={isServiceModalOpen}
+            onClose={() => {
+              setIsServiceModalOpen(false);
+              setServiceToEdit(null);
+            }}
+            onSave={handleSaveService}
+            initialData={serviceToEdit}
+          />
 
-          {activeTab === 'financeiro' && (
-            <FinanceView
-              transactions={transactions}
-              onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
-              onDeleteTransaction={handleDeleteTransaction}
-            />
-          )}
+          <NewTransactionModal
+            isOpen={isTransactionModalOpen}
+            onClose={() => setIsTransactionModalOpen(false)}
+            onSave={handleSaveTransaction}
+          />
 
-          {activeTab === 'agendamento_online' && (
-            <OnlineBookingView
-              services={services}
-              onAppointmentBooked={apt => {
-                handleSaveAppointment(apt);
-              }}
-            />
-          )}
-        </main>
-      </div>
-
-      {/* Modals */}
-      <NewAppointmentModal
-        isOpen={isAppointmentModalOpen}
-        onClose={() => setIsAppointmentModalOpen(false)}
-        onSave={handleSaveAppointment}
-        clients={clients}
-        services={services}
-      />
-
-      <NewClientModal
-        isOpen={isClientModalOpen}
-        onClose={() => {
-          setIsClientModalOpen(false);
-          setClientToEdit(null);
-        }}
-        onSave={handleSaveClient}
-        initialData={clientToEdit}
-      />
-
-      <NewServiceModal
-        isOpen={isServiceModalOpen}
-        onClose={() => {
-          setIsServiceModalOpen(false);
-          setServiceToEdit(null);
-        }}
-        onSave={handleSaveService}
-        initialData={serviceToEdit}
-      />
-
-      <NewTransactionModal
-        isOpen={isTransactionModalOpen}
-        onClose={() => setIsTransactionModalOpen(false)}
-        onSave={handleSaveTransaction}
-      />
-
-      <SupabaseConfigModal
-        isOpen={isSupabaseModalOpen}
-        onClose={() => setIsSupabaseModalOpen(false)}
-        onConnected={() => {
-          setHasSupabase(isSupabaseConnected());
-          syncWithSupabase();
-        }}
-      />
+          <SupabaseConfigModal
+            isOpen={isSupabaseModalOpen}
+            onClose={() => setIsSupabaseModalOpen(false)}
+            onConnected={() => {
+              setHasSupabase(isSupabaseConnected());
+              syncWithSupabase();
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

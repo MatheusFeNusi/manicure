@@ -28,6 +28,7 @@ create table if not exists public.services (
   duration_minutes integer not null default 60,
   description text,
   badge text,
+  image_url text,
   created_at timestamptz default now()
 );
 

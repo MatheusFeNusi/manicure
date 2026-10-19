@@ -14,7 +14,8 @@ export const INITIAL_SERVICES: Service[] = [
     price: 160,
     durationMinutes: 120,
     description: 'Alongamento super natural e resistente com acabamento fino e cutilagem russa inclusa.',
-    badge: 'Mais Pedido'
+    badge: 'Mais Pedido',
+    imageUrl: 'https://images.unsplash.com/photo-1596452760668-5369013c5e6b?w=400&h=400&fit=crop'
   },
   {
     id: 'srv-2',

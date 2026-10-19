@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Plus, Calendar, Globe, Database } from 'lucide-react';
+import { Menu, Plus, Calendar, Globe, Database, LogOut } from 'lucide-react';
 import type { ActiveTab } from '../types';
 
 interface HeaderProps {
@@ -8,7 +8,9 @@ interface HeaderProps {
   onOpenNewAppointment: () => void;
   onOpenOnlineBooking: () => void;
   onOpenSupabaseConfig: () => void;
+  onLogout: () => void;
   isSupabaseConnected: boolean;
+  isAdminAuthenticated: boolean;
 }
 
 const TAB_TITLES: Record<ActiveTab, { title: string; subtitle: string }> = {
@@ -44,7 +46,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewAppointment,
   onOpenOnlineBooking,
   onOpenSupabaseConfig,
-  isSupabaseConnected
+  onLogout,
+  isSupabaseConnected,
+  isAdminAuthenticated
 }) => {
   const currentTab = TAB_TITLES[activeTab] || TAB_TITLES.dashboard;
   
@@ -115,6 +119,17 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Globe size={15} color="var(--primary)" />
             <span>Página da Cliente</span>
+          </button>
+        )}
+
+        {isAdminAuthenticated && (
+          <button
+            className="btn btn-danger-outline"
+            onClick={onLogout}
+            style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <LogOut size={15} />
+            <span>Sair do Admin</span>
           </button>
         )}
 
