@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   getStoredClients, 
   saveStoredClients, 
@@ -9,6 +9,18 @@ import {
   getStoredTransactions, 
   saveStoredTransactions 
 } from './utils/storage';
+import { 
+  isSupabaseConnected,
+  syncFromSupabase,
+  syncUpsertClient,
+  syncDeleteClient,
+  syncUpsertService,
+  syncDeleteService,
+  syncUpsertAppointment,
+  syncDeleteAppointment,
+  syncUpsertTransaction,
+  syncDeleteTransaction
+} from './utils/supabase';
 import type { 
   Client, 
   Service, 
@@ -31,6 +43,7 @@ import { NewAppointmentModal } from './components/NewAppointmentModal';
 import { NewClientModal } from './components/NewClientModal';
 import { NewServiceModal } from './components/NewServiceModal';
 import { NewTransactionModal } from './components/NewTransactionModal';
+import { SupabaseConfigModal } from './components/SupabaseConfigModal';
 import './App.css';
 
 export function App() {
@@ -42,6 +55,7 @@ export function App() {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasSupabase, setHasSupabase] = useState(isSupabaseConnected());
 
   // Modals state
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
@@ -52,6 +66,27 @@ export function App() {
   const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
+
+  // Sync from Supabase on mount or when connected
+  const syncWithSupabase = useCallback(async () => {
+    if (!isSupabaseConnected()) return;
+    try {
+      const data = await syncFromSupabase();
+      if (data) {
+        if (data.clients && data.clients.length > 0) setClients(data.clients);
+        if (data.services && data.services.length > 0) setServices(data.services);
+        if (data.appointments && data.appointments.length > 0) setAppointments(data.appointments);
+        if (data.transactions && data.transactions.length > 0) setTransactions(data.transactions);
+      }
+    } catch (err) {
+      console.warn('Erro ao carregar dados do Supabase:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    syncWithSupabase();
+  }, [syncWithSupabase]);
 
   // Save to localStorage when state changes
   useEffect(() => {
@@ -75,9 +110,10 @@ export function App() {
     aptData: Partial<Appointment>, 
     newClientData?: Partial<Client>
   ) => {
-    // If a new client was created during appointment
+    let createdClient: Client | null = null;
+
     if (newClientData && newClientData.name) {
-      const createdClient: Client = {
+      createdClient = {
         id: newClientData.id || 'cli-' + Date.now(),
         name: newClientData.name,
         phone: newClientData.phone || '',
@@ -88,17 +124,19 @@ export function App() {
         lastVisit: aptData.date || new Date().toISOString().split('T')[0],
         createdAt: new Date().toISOString().split('T')[0]
       };
-      setClients(prev => [createdClient, ...prev]);
+      setClients(prev => [createdClient!, ...prev]);
+      syncUpsertClient(createdClient);
     } else if (aptData.clientId) {
-      // Update existing client spend stats
       setClients(prev => prev.map(c => {
         if (c.id === aptData.clientId) {
-          return {
+          const updated = {
             ...c,
             totalAppointments: c.totalAppointments + 1,
             totalSpent: c.totalSpent + (aptData.totalAmount || 0),
             lastVisit: aptData.date || c.lastVisit
           };
+          syncUpsertClient(updated);
+          return updated;
         }
         return c;
       }));
@@ -106,7 +144,7 @@ export function App() {
 
     const newAppointment: Appointment = {
       id: 'apt-' + Date.now(),
-      clientId: aptData.clientId || 'cli-generic',
+      clientId: aptData.clientId || (createdClient ? createdClient.id : 'cli-generic'),
       clientName: aptData.clientName || 'Cliente',
       clientPhone: aptData.clientPhone || '',
       serviceIds: aptData.serviceIds || [],
@@ -123,6 +161,7 @@ export function App() {
     };
 
     setAppointments(prev => [newAppointment, ...prev]);
+    syncUpsertAppointment(newAppointment);
   };
 
   const handleUpdateAppointmentStatus = (id: string, newStatus: AppointmentStatus) => {
@@ -130,7 +169,6 @@ export function App() {
       if (apt.id === id) {
         const updated = { ...apt, status: newStatus };
         
-        // If concluded, mark as paid and add to financial cash flow
         if (newStatus === 'concluido' && apt.paymentStatus !== 'pago') {
           updated.paymentStatus = 'pago';
           const newTx: Transaction = {
@@ -144,7 +182,9 @@ export function App() {
             appointmentId: apt.id
           };
           setTransactions(tPrev => [newTx, ...tPrev]);
+          syncUpsertTransaction(newTx);
         }
+        syncUpsertAppointment(updated);
         return updated;
       }
       return apt;
@@ -154,7 +194,7 @@ export function App() {
   const handleTogglePaymentStatus = (id: string) => {
     setAppointments(prev => prev.map(apt => {
       if (apt.id === id) {
-        const nextStatus = apt.paymentStatus === 'pago' ? 'pendente' : 'pago';
+        const nextStatus: 'pago' | 'pendente' = apt.paymentStatus === 'pago' ? 'pendente' : 'pago';
         if (nextStatus === 'pago') {
           const newTx: Transaction = {
             id: 'tx-' + Date.now(),
@@ -167,8 +207,11 @@ export function App() {
             appointmentId: apt.id
           };
           setTransactions(tPrev => [newTx, ...tPrev]);
+          syncUpsertTransaction(newTx);
         }
-        return { ...apt, paymentStatus: nextStatus };
+        const updated = { ...apt, paymentStatus: nextStatus };
+        syncUpsertAppointment(updated);
+        return updated;
       }
       return apt;
     }));
@@ -176,6 +219,7 @@ export function App() {
 
   const handleDeleteAppointment = (id: string) => {
     setAppointments(prev => prev.filter(a => a.id !== id));
+    syncDeleteAppointment(id);
   };
 
   // Handlers for Clients
@@ -187,11 +231,13 @@ export function App() {
       }
       return [client, ...prev];
     });
+    syncUpsertClient(client);
     setClientToEdit(null);
   };
 
   const handleDeleteClient = (id: string) => {
     setClients(prev => prev.filter(c => c.id !== id));
+    syncDeleteClient(id);
   };
 
   // Handlers for Services
@@ -203,20 +249,24 @@ export function App() {
       }
       return [service, ...prev];
     });
+    syncUpsertService(service);
     setServiceToEdit(null);
   };
 
   const handleDeleteService = (id: string) => {
     setServices(prev => prev.filter(s => s.id !== id));
+    syncDeleteService(id);
   };
 
   // Handlers for Transactions
   const handleSaveTransaction = (transaction: Transaction) => {
     setTransactions(prev => [transaction, ...prev]);
+    syncUpsertTransaction(transaction);
   };
 
   const handleDeleteTransaction = (id: string) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
+    syncDeleteTransaction(id);
   };
 
   // Appointments today count
@@ -241,6 +291,8 @@ export function App() {
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
           onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
+          onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+          isSupabaseConnected={hasSupabase}
         />
 
         <main className="content-body">
@@ -358,6 +410,15 @@ export function App() {
         isOpen={isTransactionModalOpen}
         onClose={() => setIsTransactionModalOpen(false)}
         onSave={handleSaveTransaction}
+      />
+
+      <SupabaseConfigModal
+        isOpen={isSupabaseModalOpen}
+        onClose={() => setIsSupabaseModalOpen(false)}
+        onConnected={() => {
+          setHasSupabase(isSupabaseConnected());
+          syncWithSupabase();
+        }}
       />
     </div>
   );

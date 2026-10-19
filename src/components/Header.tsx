@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Plus, Calendar, Globe } from 'lucide-react';
+import { Menu, Plus, Calendar, Globe, Database } from 'lucide-react';
 import type { ActiveTab } from '../types';
 
 interface HeaderProps {
@@ -7,6 +7,8 @@ interface HeaderProps {
   onOpenMobileMenu: () => void;
   onOpenNewAppointment: () => void;
   onOpenOnlineBooking: () => void;
+  onOpenSupabaseConfig: () => void;
+  isSupabaseConnected: boolean;
 }
 
 const TAB_TITLES: Record<ActiveTab, { title: string; subtitle: string }> = {
@@ -40,7 +42,9 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   onOpenMobileMenu,
   onOpenNewAppointment,
-  onOpenOnlineBooking
+  onOpenOnlineBooking,
+  onOpenSupabaseConfig,
+  isSupabaseConnected
 }) => {
   const currentTab = TAB_TITLES[activeTab] || TAB_TITLES.dashboard;
   
@@ -83,6 +87,25 @@ export const Header: React.FC<HeaderProps> = ({
           <Calendar size={14} color="var(--primary)" />
           <span>{todayFormatted}</span>
         </div>
+
+        {/* Supabase Status Button */}
+        <button
+          className="btn btn-secondary"
+          onClick={onOpenSupabaseConfig}
+          style={{
+            fontSize: '0.825rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            border: isSupabaseConnected ? '1px solid #c8e6c9' : '1px solid #ffe0b2',
+            background: isSupabaseConnected ? '#f1f8e9' : '#fff8e1',
+            color: isSupabaseConnected ? '#2e7d32' : '#e65100'
+          }}
+          title="Configurações do Banco Supabase"
+        >
+          <Database size={15} />
+          <span>{isSupabaseConnected ? 'Supabase Conectado' : 'Conectar Supabase'}</span>
+        </button>
 
         {activeTab !== 'agendamento_online' && (
           <button
