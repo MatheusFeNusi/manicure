@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sparkles, Clock, DollarSign, Tag, Image as ImageIcon, Upload, Trash2, Check } from 'lucide-react';
 import type { Service, ServiceCategory } from '../types';
 import { NAIL_PHOTO_PRESETS } from '../utils/nailPresets';
@@ -33,6 +33,19 @@ export const NewServiceModal: React.FC<NewServiceModalProps> = ({
   const [badge, setBadge] = useState<string>(initialData?.badge || '');
   const [imageUrl, setImageUrl] = useState<string>(initialData?.imageUrl || '');
   const [showPresets, setShowPresets] = useState<boolean>(false);
+
+  // Sincronizar campos quando o modal abrir ou os dados iniciais mudarem
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setName(initialData.name);
+      setCategory(initialData.category);
+      setPrice(String(initialData.price));
+      setDurationMinutes(String(initialData.durationMinutes));
+      setDescription(initialData.description);
+      setBadge(initialData.badge || '');
+      setImageUrl(initialData.imageUrl || '');
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 

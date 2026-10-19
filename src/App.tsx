@@ -320,6 +320,25 @@ export function App() {
     }
   }, [toast]);
 
+  // Escutar mudanças no localStorage (quando admin salva em outra aba)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'bellanail_services_v1' || e.key === 'bellanail_clients_v1') {
+        try {
+          const newServices = e.key === 'bellanail_services_v1' ? JSON.parse(e.newValue || '[]') : null;
+          const newClients = e.key === 'bellanail_clients_v1' ? JSON.parse(e.newValue || '[]') : null;
+          if (newServices) setServices(newServices);
+          if (newClients) setClients(newClients);
+          setToast({ message: 'Serviços atualizados automaticamente', type: 'success' });
+        } catch {
+          // ignorar parse errors
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Appointments today count
   const todayStr = new Date().toISOString().split('T')[0];
   const todayAppointmentsCount = appointments.filter(a => a.date === todayStr).length;
