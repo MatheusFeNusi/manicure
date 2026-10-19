@@ -754,3 +754,52 @@
     padding: 1.25rem 1rem;
   }
 }
+
+/* Visão pública do cliente - responsividade */
+.public-view-card {
+  padding: 1.5rem !important;
+  margin: 0 0.5rem !important;
+}
+
+.public-view-title {
+  font-size: 1.25rem !important;
+}
+
+.booking-portal-container {
+  margin: 0 0.5rem;
+  border-radius: var(--radius-md);
+}
+
+.portal-content {
+  padding: 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .content-body {
+    padding: 1rem 0.5rem;
+  }
+
+  .topbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .topbar-actions {
+    gap: 0.5rem;
+  }
+
+  .booking-portal-container {
+    margin: 0 0.25rem;
+  }
+
+  .portal-content {
+    padding: 1rem;
+  }
+
+  .portal-banner {
+    padding: 1.5rem 1rem;
+  }
+
+  .portal-banner h2 {
+    font-size: 1.5rem;
+  }
+}

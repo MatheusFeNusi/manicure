@@ -60,6 +60,7 @@ export function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasSupabase, setHasSupabase] = useState(isSupabaseConnected());
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem('bellanail_admin_auth');
@@ -305,10 +306,11 @@ export function App() {
   return (
     <div className="app-container">
       {!isAdminAuthenticated ? (
+        <>
         /* ============ VISTA PÚBLICA DO CLIENTE (sem login) ============ */
         <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
           <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
-            <div style={{
+            <div className="public-view-card" style={{
               background: 'var(--surface)',
               border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-lg)',
@@ -340,6 +342,7 @@ export function App() {
                 onClick={() => {
                   setIsServiceModalOpen(false);
                   setIsAppointmentModalOpen(false);
+                  setIsLoginModalOpen(true);
                 }}
                 className="btn btn-secondary"
                 style={{
@@ -351,7 +354,10 @@ export function App() {
                   color: 'var(--primary)',
                   background: 'transparent',
                   padding: '0.75rem 1.5rem',
-                  borderRadius: 'var(--radius-md)'
+                  borderRadius: 'var(--radius-md)',
+                  width: '100%',
+                  maxWidth: '320px',
+                  justifyContent: 'center'
                 }}
               >
                 <Lock size={18} style={{ marginRight: '0.4rem' }} />
@@ -360,6 +366,16 @@ export function App() {
             </div>
           </div>
         </div>
+
+        {isLoginModalOpen && (
+          <LoginView
+            onLogin={() => {
+              setIsAdminAuthenticated(true);
+              setIsLoginModalOpen(false);
+            }}
+          />
+        )}
+        </>
       ) : (
         /* ============ PAINEL ADMINISTRATIVO (requer login) ============ */
         <>
