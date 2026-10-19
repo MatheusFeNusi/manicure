@@ -30,7 +30,7 @@ import type {
   ActiveTab, 
   AppointmentStatus 
 } from './types';
-import { Globe, Lock } from 'lucide-react';
+import { Globe, Lock, RefreshCw, Database } from 'lucide-react';
 
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -358,13 +358,30 @@ export function App() {
               />
             </div>
 
-            <div style={{ textAlign: 'center' }}>
+            {!isSupabaseConnected && (
+              <div style={{
+                background: '#fff8e1',
+                border: '1px solid #ffe0b2',
+                color: '#e65100',
+                padding: '1rem 1.25rem',
+                borderRadius: 'var(--radius-md)',
+                marginTop: '1.5rem',
+                fontSize: '0.875rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem'
+              }}>
+                <Database size={16} />
+                <span>
+                  Banco de dados nao conectado. As edicoes do admin ficam so neste navegador.
+                  Conecte o Supabase para sincronizar com a pagina do cliente.
+                </span>
+              </div>
+            )}
+
+            <div style={{ textAlign: 'center', gap: '0.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <button
-                onClick={() => {
-                  setIsServiceModalOpen(false);
-                  setIsAppointmentModalOpen(false);
-                  setIsLoginModalOpen(true);
-                }}
+                onClick={syncWithSupabase}
                 className="btn btn-secondary"
                 style={{
                   display: 'inline-flex',
@@ -376,14 +393,39 @@ export function App() {
                   background: 'transparent',
                   padding: '0.75rem 1.5rem',
                   borderRadius: 'var(--radius-md)',
-                  width: '100%',
-                  maxWidth: '320px',
-                  justifyContent: 'center'
+                  maxWidth: '320px'
                 }}
               >
-                <Lock size={18} style={{ marginRight: '0.4rem' }} />
-                Acessar Painel Administrativo
+                <RefreshCw size={16} />
+                Atualizar Serviços
               </button>
+
+              {!isAdminAuthenticated && (
+                <button
+                  onClick={() => {
+                    setIsServiceModalOpen(false);
+                    setIsAppointmentModalOpen(false);
+                    setIsLoginModalOpen(true);
+                  }}
+                  className="btn btn-secondary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontWeight: 700,
+                    border: '1px solid var(--primary)',
+                    color: 'var(--primary)',
+                    background: 'transparent',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: 'var(--radius-md)',
+                    maxWidth: '320px',
+                    marginTop: '0.75rem'
+                  }}
+                >
+                  <Lock size={18} style={{ marginRight: '0.4rem' }} />
+                  Acessar Painel Administrativo
+                </button>
+              )}
             </div>
           </div>
         </div>
