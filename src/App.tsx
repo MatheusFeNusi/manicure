@@ -16,7 +16,8 @@ import {
   syncDeleteClient,
   syncUpsertService,
   syncDeleteService,
-  syncUpsertAppointment,
+  syncCreateAppointment,
+  syncUpdateAppointmentStatus,
   syncDeleteAppointment,
   syncUpsertTransaction,
   syncDeleteTransaction
@@ -161,7 +162,15 @@ export function App() {
     };
 
     setAppointments(prev => [newAppointment, ...prev]);
-    syncUpsertAppointment(newAppointment);
+    if (newAppointment.serviceIds && newAppointment.serviceIds[0]) {
+      syncCreateAppointment(
+        newAppointment.clientName,
+        newAppointment.clientPhone,
+        newAppointment.serviceIds[0],
+        newAppointment.date,
+        newAppointment.time
+      );
+    }
   };
 
   const handleUpdateAppointmentStatus = (id: string, newStatus: AppointmentStatus) => {
@@ -184,7 +193,7 @@ export function App() {
           setTransactions(tPrev => [newTx, ...tPrev]);
           syncUpsertTransaction(newTx);
         }
-        syncUpsertAppointment(updated);
+        syncUpdateAppointmentStatus(id, newStatus);
         return updated;
       }
       return apt;
@@ -210,7 +219,7 @@ export function App() {
           syncUpsertTransaction(newTx);
         }
         const updated = { ...apt, paymentStatus: nextStatus };
-        syncUpsertAppointment(updated);
+        syncUpdateAppointmentStatus(apt.id, apt.status);
         return updated;
       }
       return apt;
