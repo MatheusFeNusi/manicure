@@ -89,6 +89,7 @@ export function App() {
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Sync from Supabase on mount or when connected
   const syncWithSupabase = useCallback(async () => {
@@ -271,7 +272,7 @@ export function App() {
   };
 
   // Handlers for Services
-  const handleSaveService = (service: Service) => {
+  const handleSaveService = async (service: Service) => {
     setServices(prev => {
       const exists = prev.some(s => s.id === service.id);
       if (exists) {
@@ -279,13 +280,23 @@ export function App() {
       }
       return [service, ...prev];
     });
-    syncUpsertService(service);
+    const result = await syncUpsertService(service);
+    if (result.ok) {
+      setToast({ message: 'Serviço salvo no banco de dados', type: 'success' });
+    } else {
+      setToast({ message: `Erro ao salvar no banco: ${result.error}`, type: 'error' });
+    }
     setServiceToEdit(null);
   };
 
-  const handleDeleteService = (id: string) => {
+  const handleDeleteService = async (id: string) => {
     setServices(prev => prev.filter(s => s.id !== id));
-    syncDeleteService(id);
+    const result = await syncDeleteService(id);
+    if (result.ok) {
+      setToast({ message: 'Serviço removido do banco de dados', type: 'success' });
+    } else {
+      setToast({ message: `Erro ao remover do banco: ${result.error}`, type: 'error' });
+    }
   };
 
   // Handlers for Transactions
@@ -298,6 +309,14 @@ export function App() {
     setTransactions(prev => prev.filter(t => t.id !== id));
     syncDeleteTransaction(id);
   };
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Appointments today count
   const todayStr = new Date().toISOString().split('T')[0];
@@ -528,6 +547,27 @@ export function App() {
               syncWithSupabase();
             }}
           />
+
+          {/* Toast de notificacao de sincronizacao */}
+          {toast && (
+            <div style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              padding: '1rem 1.5rem',
+              borderRadius: 'var(--radius-md)',
+              color: 'white',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              boxShadow: 'var(--shadow-lg)',
+              zIndex: 1000,
+              background: toast.type === 'success' ? '#2e7d32' : '#b3261e',
+              border: '1px solid rgba(255,255,255,0.3)',
+              animation: 'slideIn 0.3s ease-out'
+            }}>
+              {toast.message}
+            </div>
+          )}
         </>
       )}
     </div>

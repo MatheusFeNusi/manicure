@@ -174,8 +174,11 @@ export const syncFromSupabase = async () => {
   }
 };
 
-export const syncUpsertService = async (serviceData: Service) => {
+export const syncUpsertService = async (serviceData: Service): Promise<{ ok: boolean; error?: string }> => {
   const client = getSupabase();
+  if (!isSupabaseConnected()) {
+    return { ok: false, error: 'Supabase nao conectado' };
+  }
   try {
     await client.from('servicos').upsert({
       nome: serviceData.name,
@@ -184,17 +187,24 @@ export const syncUpsertService = async (serviceData: Service) => {
       ativo: true,
       image_url: serviceData.imageUrl || null
     });
-  } catch (err) {
+    return { ok: true };
+  } catch (err: any) {
     console.error('Falha ao salvar servico no Supabase:', err);
+    return { ok: false, error: err?.message || 'Erro ao salvar servico' };
   }
 };
 
-export const syncDeleteService = async (id: string) => {
+export const syncDeleteService = async (id: string): Promise<{ ok: boolean; error?: string }> => {
   const client = getSupabase();
+  if (!isSupabaseConnected()) {
+    return { ok: false, error: 'Supabase nao conectado' };
+  }
   try {
     await client.from('servicos').update({ ativo: false }).eq('id', id);
-  } catch (err) {
+    return { ok: true };
+  } catch (err: any) {
     console.error('Falha ao deletar servico no Supabase:', err);
+    return { ok: false, error: err?.message || 'Erro ao deletar servico' };
   }
 };
 
