@@ -31,8 +31,6 @@ import type {
   Transaction,
   AppointmentStatus,
 } from './types';
-import { Database } from 'lucide-react';
-
 import { PublicPage } from './pages/PublicPage';
 import { AdminPage } from './pages/AdminPage';
 
@@ -47,9 +45,8 @@ export function App() {
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hasSupabase, setHasSupabase] = useState(isSupabaseConnected());
+  const hasSupabase = isSupabaseConnected();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Modals state
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
@@ -223,40 +220,6 @@ export function App() {
     );
   };
 
-  const handleTogglePaymentStatus = (id: string) => {
-    setAppointments((prev) =>
-      prev.map((apt) => {
-        if (apt.id === id) {
-          const nextStatus: 'pago' | 'pendente' =
-            apt.paymentStatus === 'pago' ? 'pendente' : 'pago';
-          if (nextStatus === 'pago') {
-            const newTx: Transaction = {
-              id: 'tx-' + Date.now(),
-              type: 'receita',
-              category: 'Atendimento',
-              description: `Recebimento ${apt.clientName} (${apt.servicesSummary})`,
-              amount: apt.totalAmount,
-              date: apt.date,
-              paymentMethod: apt.paymentMethod === 'Pendente' ? 'Pix' : apt.paymentMethod,
-              appointmentId: apt.id,
-            };
-            setTransactions((tPrev) => [newTx, ...tPrev]);
-            syncUpsertTransaction(newTx);
-          }
-          const updated = { ...apt, paymentStatus: nextStatus };
-          syncUpdateAppointmentStatus(apt.id, apt.status);
-          return updated;
-        }
-        return apt;
-      })
-    );
-  };
-
-  const handleDeleteAppointment = (id: string) => {
-    setAppointments((prev) => prev.filter((a) => a.id !== id));
-    syncDeleteAppointment(id);
-  };
-
   const handleSaveClient = (client: Client) => {
     setClients((prev) => {
       const exists = prev.some((c) => c.id === client.id);
@@ -363,7 +326,6 @@ export function App() {
                 setClients={setClients}
                 setIsServiceModalOpen={setIsServiceModalOpen}
                 setIsAppointmentModalOpen={setIsAppointmentModalOpen}
-                setIsLoginModalOpen={setIsLoginModalOpen}
                 setIsAdminAuthenticated={setIsAdminAuthenticated}
               />
             }
@@ -390,7 +352,9 @@ export function App() {
                     setIsClientModalOpen(true);
                   }}
                   onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
-                  onUpdateAppointmentStatus={handleUpdateAppointmentStatus}
+                  onUpdateAppointmentStatus={(id, status) =>
+                    handleUpdateAppointmentStatus(id, status as AppointmentStatus)
+                  }
                   onSelectTab={setActiveTab}
                   onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
                   onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
