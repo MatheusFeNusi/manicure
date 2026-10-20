@@ -16,7 +16,7 @@ interface PublicPageProps {
 }
 
 export const PublicPage: React.FC<PublicPageProps> = ({
-  services,
+  services: servicesProp,
   onAppointmentBooked,
   setServices,
   setClients,
@@ -27,21 +27,39 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const navigate = useNavigate();
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
   const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
+  const [localServices, setLocalServices] = React.useState(servicesProp);
 
-  const handleSync = async () => {
-    if (!isSupabaseConnected()) return;
-    try {
-      const data = await syncFromSupabase();
-      if (data?.services) setServices(data.services);
-      if (data?.clients) setClients(data.clients);
-    } catch {
-      // ignore
-    }
-  };
+  // Escutar mudanças no localStorage feitas pelo admin em outra aba
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'bellanail_services_v1') {
+        try {
+          const newServices = JSON.parse(e.newValue || '[]');
+          if (newServices && newServices.length > 0) {
+            setLocalServices(newServices);
+            setServices(newServices);
+            setToast({ message: 'Serviços atualizados pelo admin', type: 'success' });
+          }
+        } catch { /* ignore */ }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   React.useEffect(() => {
     setHasSupabase(isSupabaseConnected());
   }, []);
+
+  const [toast, setToast] = React.useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // Auto-dismiss toast
+  React.useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   return (
     <>
@@ -69,7 +87,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
               </div>
             </div>
             <OnlineBookingView
-              services={services}
+              services={localServices}
               onAppointmentBooked={onAppointmentBooked}
             />
           </div>
@@ -161,6 +179,27 @@ export const PublicPage: React.FC<PublicPageProps> = ({
               navigate('/admin');
             }}
           />
+        </div>
+      )}
+
+      {/* Toast de notificação */}
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          padding: '1rem 1.5rem',
+          borderRadius: 'var(--radius-md)',
+          color: 'white',
+          fontWeight: 700,
+          fontSize: '0.95rem',
+          boxShadow: 'var(--shadow-lg)',
+          zIndex: 1000,
+          background: toast.type === 'success' ? '#2e7d32' : '#b3261e',
+          border: '1px solid rgba(255,255,255,0.3)',
+          animation: 'slideIn 0.3s ease-out',
+        }}>
+          {toast.message}
         </div>
       )}
     </>
