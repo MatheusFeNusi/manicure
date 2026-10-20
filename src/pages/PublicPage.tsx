@@ -47,6 +47,20 @@ export const PublicPage: React.FC<PublicPageProps> = ({
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // FORÇAR leitura do localStorage ao montar a página do cliente
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('bellanail_services_v1');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.length > 0) {
+          setLocalServices(parsed);
+          setServices(parsed);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   React.useEffect(() => {
     setHasSupabase(isSupabaseConnected());
   }, []);
