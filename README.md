@@ -45,8 +45,6 @@ Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular
 
 ---
 
-Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
-
 ## 🛠️ Tecnologias Utilizadas
 
 - **React 19**
@@ -58,8 +56,6 @@ Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular
 - **LocalStorage** para persistência no navegador
 
 ---
-
-Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
 
 ## 🚀 Como Executar Localmente
 
@@ -82,7 +78,5 @@ Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular
 4. Abra no seu navegador: `http://localhost:5173/`
 
 ---
-
-Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
 
 Desenvolvido com carinho para elevar a gestão de profissionais da beleza! 💅✨
