@@ -1,10 +1,10 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Client, Service, Appointment, Transaction, AppointmentStatus } from '../types';
 
-export const SUPABASE_URL = 
+export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL || 'https://etcavgnvcsouujdnrnsf.supabase.co';
 
-const DEFAULT_KEY = 
+const DEFAULT_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0Y2F2Z252Y3NvdXVqZG5ybnNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjQzMTgyNiwiZXhwIjoyMTA4MDA3ODI2fQ.bGNbCXneESfoLU9yBvCcn0xUfXdYQN2bj0jc87ZVwrA';
 
 const STORAGE_KEY_ANON = 'bellanail_supabase_anon_key';
@@ -51,11 +51,11 @@ export const isSupabaseConnected = (): boolean => {
 export const mapSupabaseService = (row: any): Service => {
   let category: Service['category'] = 'Alongamento';
   const nameLower = (row.nome || '').toLowerCase();
-  if (nameLower.includes('manuten')) category = 'ManutenÃ§Ã£o';
-  else if (nameLower.includes('gel') || nameLower.includes('blindagem')) category = 'EsmaltaÃ§Ã£o & Gel';
+  if (nameLower.includes('manuten')) category = 'Manutenção';
+  else if (nameLower.includes('gel') || nameLower.includes('blindagem')) category = 'Esmaltação & Gel';
   else if (nameLower.includes('spa') || nameLower.includes('podal')) category = 'SPA & Tratamentos';
   else if (nameLower.includes('art') || nameLower.includes('reversa')) category = 'Nail Art';
-  else if (nameLower.includes('mÃ£o') || nameLower.includes('pÃ©') || nameLower.includes('cutil')) category = 'MÃ£os & PÃ©s';
+  else if (nameLower.includes('mão') || nameLower.includes('pé') || nameLower.includes('cutil')) category = 'Mãos & Pés';
 
   return {
     id: row.id,
@@ -63,8 +63,8 @@ export const mapSupabaseService = (row: any): Service => {
     category,
     price: Number(row.preco) || 0,
     durationMinutes: Number(row.duracao_minutos) || 60,
-    description: `Procedimento profissional no Studio BellaNail. DuraÃ§Ã£o mÃ©dia: ${row.duracao_minutos || 60} min.`,
-    badge: (row.preco > 100 ? 'Mais Pedido' : row.duracao_minutos <= 45 ? 'Especial' : 'TendÃªncia') as Service['badge'],
+    description: `Procedimento profissional no Studio BellaNail. Duração média: ${row.duracao_minutos || 60} min.`,
+    badge: (row.preco > 100 ? 'Mais Pedido' : row.duracao_minutos <= 45 ? 'Especial' : 'Tendência') as Service['badge'],
     imageUrl: row.image_url || undefined
   };
 };
@@ -132,8 +132,8 @@ export const syncFromSupabase = async () => {
     if (sErr) console.warn('Erro buscando servicos:', sErr);
     if (aErr) console.warn('Erro buscando agendamentos:', aErr);
 
-    const services = servicosData && servicosData.length > 0 
-      ? servicosData.map(mapSupabaseService) 
+    const services = servicosData && servicosData.length > 0
+      ? servicosData.map(mapSupabaseService)
       : null;
 
     const appointments = agendamentosData && agendamentosData.length > 0
@@ -227,7 +227,7 @@ export const syncCreateAppointment = async (
       .single();
 
     if (slotErr || !slot) {
-      console.warn('Aviso ao criar horÃ¡rio:', slotErr);
+      console.warn('Aviso ao criar horário:', slotErr);
     }
 
     const horarioId = slot ? slot.id : null;
@@ -297,7 +297,7 @@ export const syncUpsertTransaction = async (_t: Transaction) => {};
 export const syncDeleteTransaction = async (_id: string) => {};
 
 /**
- * Inscreve em mudanÃ§as em tempo real da tabela 'servicos' no Supabase.
+ * Inscreve em mudanças em tempo real da tabela 'servicos' no Supabase.
  * Chama onChange(services) sempre que houver INSERT/UPDATE/DELETE.
  * Retorna funcao para cancelar a inscricao.
  */
