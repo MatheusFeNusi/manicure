@@ -337,8 +337,6 @@ export function App() {
               <PublicPage
                 services={services}
                 onAppointmentBooked={handleSaveAppointment}
-                setServices={setServices}
-                setClients={setClients}
                 setIsServiceModalOpen={setIsServiceModalOpen}
                 setIsAppointmentModalOpen={setIsAppointmentModalOpen}
                 setIsAdminAuthenticated={setIsAdminAuthenticated}
