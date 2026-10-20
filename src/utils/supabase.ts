@@ -51,11 +51,11 @@ export const isSupabaseConnected = (): boolean => {
 export const mapSupabaseService = (row: any): Service => {
   let category: Service['category'] = 'Alongamento';
   const nameLower = (row.nome || '').toLowerCase();
-  if (nameLower.includes('manuten')) category = 'Manutenção';
-  else if (nameLower.includes('gel') || nameLower.includes('blindagem')) category = 'Esmaltação & Gel';
+  if (nameLower.includes('manuten')) category = 'ManutenÃ§Ã£o';
+  else if (nameLower.includes('gel') || nameLower.includes('blindagem')) category = 'EsmaltaÃ§Ã£o & Gel';
   else if (nameLower.includes('spa') || nameLower.includes('podal')) category = 'SPA & Tratamentos';
   else if (nameLower.includes('art') || nameLower.includes('reversa')) category = 'Nail Art';
-  else if (nameLower.includes('mão') || nameLower.includes('pé') || nameLower.includes('cutil')) category = 'Mãos & Pés';
+  else if (nameLower.includes('mÃ£o') || nameLower.includes('pÃ©') || nameLower.includes('cutil')) category = 'MÃ£os & PÃ©s';
 
   return {
     id: row.id,
@@ -63,8 +63,8 @@ export const mapSupabaseService = (row: any): Service => {
     category,
     price: Number(row.preco) || 0,
     durationMinutes: Number(row.duracao_minutos) || 60,
-    description: `Procedimento profissional no Studio BellaNail. Duração média: ${row.duracao_minutos || 60} min.`,
-    badge: (row.preco > 100 ? 'Mais Pedido' : row.duracao_minutos <= 45 ? 'Especial' : 'Tendência') as Service['badge'],
+    description: `Procedimento profissional no Studio BellaNail. DuraÃ§Ã£o mÃ©dia: ${row.duracao_minutos || 60} min.`,
+    badge: (row.preco > 100 ? 'Mais Pedido' : row.duracao_minutos <= 45 ? 'Especial' : 'TendÃªncia') as Service['badge'],
     imageUrl: row.image_url || undefined
   };
 };
@@ -227,7 +227,7 @@ export const syncCreateAppointment = async (
       .single();
 
     if (slotErr || !slot) {
-      console.warn('Aviso ao criar horário:', slotErr);
+      console.warn('Aviso ao criar horÃ¡rio:', slotErr);
     }
 
     const horarioId = slot ? slot.id : null;
@@ -295,3 +295,42 @@ export const syncUpsertClient = async (_c: Client) => {};
 export const syncDeleteClient = async (_id: string) => {};
 export const syncUpsertTransaction = async (_t: Transaction) => {};
 export const syncDeleteTransaction = async (_id: string) => {};
+
+/**
+ * Inscreve em mudanÃ§as em tempo real da tabela 'servicos' no Supabase.
+ * Chama onChange(services) sempre que houver INSERT/UPDATE/DELETE.
+ * Retorna funcao para cancelar a inscricao.
+ */
+export const subscribeToServiceChanges = (onChange: (services: Service[]) => void) => {
+  const client = getSupabase();
+  const channel = client.channel('services-changes');
+
+  channel
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'servicos'
+      },
+      async () => {
+        try {
+          const data = await syncFromSupabase();
+          if (data?.services && data.services.length > 0) {
+            onChange(data.services);
+          }
+        } catch (err) {
+          console.warn('Erro ao sincronizar servicos em tempo real:', err);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    try {
+      channel.unsubscribe();
+    } catch {
+      // ignore
+    }
+  };
+};
