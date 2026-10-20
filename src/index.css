@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Brand Luxury Palette */
   --primary: #c84b65;
   --primary-hover: #b33952;
   --primary-light: #fcecef;
@@ -19,13 +18,11 @@
   --border-color: #eddfe5;
   --border-subtle: #f4ecf0;
 
-  /* Typography Colors */
   --text-main: #241c21;
   --text-muted: #786b73;
   --text-light: #a497a0;
   --text-white: #ffffff;
 
-  /* Status Colors */
   --status-scheduled-bg: #e8f4fd;
   --status-scheduled-text: #1976d2;
   --status-confirmed-bg: #eef7ed;
@@ -37,33 +34,25 @@
   --status-canceled-bg: #ffebee;
   --status-canceled-text: #c62828;
 
-  /* Shadows */
   --shadow-sm: 0 2px 8px rgba(160, 100, 120, 0.06);
   --shadow-md: 0 6px 20px rgba(160, 100, 120, 0.09);
   --shadow-lg: 0 14px 34px rgba(160, 100, 120, 0.14);
   --shadow-glow: 0 8px 25px rgba(200, 75, 101, 0.3);
 
-  /* Borders & Radius */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-full: 9999px;
 
-  /* Font Families */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
 
-  /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: var(--font-sans);
@@ -104,46 +93,22 @@ input:focus, select:focus, textarea:focus {
   background: #ffffff;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f1e9ee;
-}
-::-webkit-scrollbar-thumb {
-  background: #d4c4cc;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1e9ee; }
+::-webkit-scrollbar-thumb { background: #d4c4cc; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-/* Utility Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(200, 75, 101, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(200, 75, 101, 0);
-  }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 75, 101, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(200, 75, 101, 0); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+.animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 /* Shared Modal Backdrop */
 .modal-overlay {
@@ -198,17 +163,9 @@ input:focus, select:focus, textarea:focus {
   background: var(--surface-alt);
 }
 
-.modal-close-btn:hover {
-  background: #f0e4e8;
-  color: var(--text-main);
-}
+.modal-close-btn:hover { background: #f0e4e8; color: var(--text-main); }
 
-.modal-body {
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
+.modal-body { padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
 .modal-footer {
   padding: 1.25rem 1.75rem;
@@ -222,37 +179,12 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Form Styles */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem; }
+.form-hint { font-size: 0.775rem; color: var(--text-muted); }
 
-.form-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.form-hint {
-  font-size: 0.775rem;
-  color: var(--text-muted);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-@media (max-width: 600px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
 
 /* Button Variants */
 .btn {
@@ -282,9 +214,7 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 6px 20px var(--primary-glow);
 }
 
-.btn-primary:active {
-  transform: translateY(0);
-}
+.btn-primary:active { transform: translateY(0); }
 
 .btn-secondary {
   background: var(--surface-alt);
@@ -292,10 +222,7 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid var(--border-color);
 }
 
-.btn-secondary:hover {
-  background: var(--surface-hover);
-  border-color: #d8c7cf;
-}
+.btn-secondary:hover { background: var(--surface-hover); border-color: #d8c7cf; }
 
 .btn-gold {
   background: linear-gradient(135deg, var(--accent-gold) 0%, #dfa539 100%);
@@ -308,35 +235,16 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-1.5px);
 }
 
-.btn-success {
-  background: #2e7d32;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #1b5e20;
-}
-
-.btn-whatsapp {
-  background: #25d366;
-  color: white;
-  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25);
-}
-
-.btn-whatsapp:hover {
-  background: #1eb954;
-  transform: translateY(-1px);
-}
-
+.btn-success { background: #2e7d32; color: white; }
+.btn-success:hover { background: #1b5e20; }
+.btn-whatsapp { background: #25d366; color: white; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25); }
+.btn-whatsapp:hover { background: #1eb954; transform: translateY(-1px); }
 .btn-danger-outline {
   color: #c62828;
   border: 1px solid #ffcdd2;
   background: #ffebee;
 }
-
-.btn-danger-outline:hover {
-  background: #ffcdd2;
-}
+.btn-danger-outline:hover { background: #ffcdd2; }
 
 /* Badges */
 .badge {
@@ -351,40 +259,10 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.04em;
 }
 
-.badge-scheduled {
-  background: var(--status-scheduled-bg);
-  color: var(--status-scheduled-text);
-}
-
-.badge-confirmed {
-  background: var(--status-confirmed-bg);
-  color: var(--status-confirmed-text);
-}
-
-.badge-in_progress {
-  background: var(--status-in-progress-bg);
-  color: var(--status-in-progress-text);
-  animation: pulseGlow 2s infinite;
-}
-
-.badge-completed {
-  background: var(--status-completed-bg);
-  color: var(--status-completed-text);
-}
-
-.badge-canceled {
-  background: var(--status-canceled-bg);
-  color: var(--status-canceled-text);
-}
-
-.badge-gold {
-  background: var(--accent-gold-light);
-  color: var(--accent-gold);
-  border: 1px solid rgba(198, 146, 43, 0.25);
-}
-
-.badge-rose {
-  background: var(--primary-light);
-  color: var(--primary);
-  border: 1px solid rgba(200, 75, 101, 0.2);
-}
+.badge-scheduled { background: var(--status-scheduled-bg); color: var(--status-scheduled-text); }
+.badge-confirmed { background: var(--status-confirmed-bg); color: var(--status-confirmed-text); }
+.badge-in_progress { background: var(--status-in-progress-bg); color: var(--status-in-progress-text); animation: pulseGlow 2s infinite; }
+.badge-completed { background: var(--status-completed-bg); color: var(--status-completed-text); }
+.badge-canceled { background: var(--status-canceled-bg); color: var(--status-canceled-text); }
+.badge-gold { background: var(--accent-gold-light); color: var(--accent-gold); border: 1px solid rgba(198, 146, 43, 0.25); }
+.badge-rose { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(200, 75, 101, 0.2); }
