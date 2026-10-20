@@ -47,6 +47,16 @@ export function App() {
   const hasSupabase = isSupabaseConnected();
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
+  // Restaurar autenticação do admin ao montar (para permanecer na /admin após F5)
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('bellanail_admin_auth');
+      if (stored === 'true') {
+        setIsAdminAuthenticated(true);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   // Modals state
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
