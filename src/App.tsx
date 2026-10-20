@@ -57,7 +57,7 @@ export function App() {
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Sync from Supabase on mount or when connected
+  // Sync from Supabase on mount ONLY if localStorage is empty (first time setup)
   const syncWithSupabase = useCallback(async () => {
     if (!isSupabaseConnected()) {
       setToast({ message: 'Supabase não conectado. Configure em Configurações.', type: 'error' });
@@ -66,9 +66,10 @@ export function App() {
     try {
       const data = await syncFromSupabase();
       if (data) {
-        if (data.services && data.services.length > 0) setServices(data.services);
-        if (data.clients && data.clients.length > 0) setClients(data.clients);
-        if (data.appointments && data.appointments.length > 0) setAppointments(data.appointments);
+        // Só preencher se o localStorage estiver vazio (primeiro acesso)
+        if (data.services && data.services.length > 0 && services.length === 0) setServices(data.services);
+        if (data.clients && data.clients.length > 0 && clients.length === 0) setClients(data.clients);
+        if (data.appointments && data.appointments.length > 0 && appointments.length === 0) setAppointments(data.appointments);
         setToast({ message: 'Dados sincronizados com o banco de dados', type: 'success' });
       } else {
         setToast({ message: 'Nenhum dado encontrado no banco', type: 'error' });
@@ -77,11 +78,14 @@ export function App() {
       setToast({ message: 'Erro ao sincronizar com o banco', type: 'error' });
       console.warn('Erro ao carregar dados do Supabase:', err);
     }
-  }, []);
+  }, [services, clients, appointments]);
 
   useEffect(() => {
-    syncWithSupabase();
-  }, [syncWithSupabase]);
+    // Só sincronizar com Supabase se o localStorage estiver vazio
+    if (services.length === 0 && clients.length === 0) {
+      syncWithSupabase();
+    }
+  }, [syncWithSupabase, services, clients]);
 
   // Inscrição em tempo real no Supabase: página do cliente atualiza quando admin edita serviços
   useEffect(() => {
