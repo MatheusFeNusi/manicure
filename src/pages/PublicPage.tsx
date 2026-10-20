@@ -11,7 +11,6 @@ interface PublicPageProps {
   setClients: (c: any[]) => void;
   setIsServiceModalOpen: (v: boolean) => void;
   setIsAppointmentModalOpen: (v: boolean) => void;
-  setIsLoginModalOpen: (v: boolean) => void;
   setIsAdminAuthenticated: (v: boolean) => void;
 }
 
@@ -22,7 +21,6 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   setClients,
   setIsServiceModalOpen,
   setIsAppointmentModalOpen,
-  setIsLoginModalOpen,
   setIsAdminAuthenticated,
 }) => {
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
