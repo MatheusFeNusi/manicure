@@ -60,7 +60,7 @@ export function App() {
   // Sync from Supabase on mount or when connected
   const syncWithSupabase = useCallback(async () => {
     if (!isSupabaseConnected()) {
-      setToast({ message: 'Supabase nÃ£o conectado. Configure em ConfiguraÃ§Ãµes.', type: 'error' });
+      setToast({ message: 'Supabase não conectado. Configure em Configurações.', type: 'error' });
       return;
     }
     try {
@@ -83,14 +83,14 @@ export function App() {
     syncWithSupabase();
   }, [syncWithSupabase]);
 
-  // InscriÃ§Ã£o em tempo real no Supabase: pÃ¡gina do cliente atualiza quando admin edita serviÃ§os
+  // Inscrição em tempo real no Supabase: página do cliente atualiza quando admin edita serviços
   useEffect(() => {
     if (!isSupabaseConnected()) return;
 
     const unsubscribe = subscribeToServiceChanges((newServices) => {
       setServices(newServices);
       saveStoredServices(newServices);
-      setToast({ message: 'ServiÃ§os atualizados em tempo real', type: 'success' });
+      setToast({ message: 'Serviços atualizados em tempo real', type: 'success' });
     });
 
     return () => unsubscribe();
@@ -102,7 +102,7 @@ export function App() {
   useEffect(() => { saveStoredAppointments(appointments); }, [appointments]);
   useEffect(() => { saveStoredTransactions(transactions); }, [transactions]);
 
-  // Escutar mudanÃ§as no localStorage (quando admin salva em outra aba)
+  // Escutar mudanças no localStorage (quando admin salva em outra aba)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'bellanail_services_v1' || e.key === 'bellanail_clients_v1') {
@@ -113,7 +113,7 @@ export function App() {
           if (e.key === 'bellanail_clients_v1') {
             setClients(JSON.parse(e.newValue || '[]'));
           }
-          setToast({ message: 'ServiÃ§os atualizados automaticamente', type: 'success' });
+          setToast({ message: 'Serviços atualizados automaticamente', type: 'success' });
         } catch { /* ignore */ }
       }
     };
@@ -222,31 +222,39 @@ export function App() {
   const handleSaveClient = (client: Client) => {
     setClients((prev) => {
       const exists = prev.some((c) => c.id === client.id);
-      if (exists) {
-        return prev.map((c) => (c.id === client.id ? client : c));
-      }
-      return [client, ...prev];
+      const updated = exists
+        ? prev.map((c) => (c.id === client.id ? client : c))
+        : [client, ...prev];
+      saveStoredClients(updated);
+      return updated;
     });
     syncUpsertClient(client);
     setClientToEdit(null);
   };
 
   const handleDeleteClient = (id: string) => {
-    setClients((prev) => prev.filter((c) => c.id !== id));
+    setClients((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      saveStoredClients(updated);
+      return updated;
+    });
     syncDeleteClient(id);
   };
 
   const handleSaveService = async (service: Service) => {
+    // Atualizar estado e gravar no localStorage imediatamente
     setServices((prev) => {
       const exists = prev.some((s) => s.id === service.id);
-      if (exists) {
-        return prev.map((s) => (s.id === service.id ? service : s));
-      }
-      return [service, ...prev];
+      const updated = exists
+        ? prev.map((s) => (s.id === service.id ? service : s))
+        : [service, ...prev];
+      // FORÇAR gravação no localStorage imediatamente
+      saveStoredServices(updated);
+      return updated;
     });
     const result = await syncUpsertService(service);
     if (result.ok) {
-      setToast({ message: 'ServiÃ§o salvo no banco de dados', type: 'success' });
+      setToast({ message: 'Serviço salvo no banco de dados', type: 'success' });
     } else {
       setToast({ message: `Erro ao salvar no banco: ${result.error}`, type: 'error' });
     }
@@ -257,19 +265,27 @@ export function App() {
     setServices((prev) => prev.filter((s) => s.id !== id));
     const result = await syncDeleteService(id);
     if (result.ok) {
-      setToast({ message: 'ServiÃ§o removido do banco de dados', type: 'success' });
+      setToast({ message: 'Serviço removido do banco de dados', type: 'success' });
     } else {
       setToast({ message: `Erro ao remover do banco: ${result.error}`, type: 'error' });
     }
   };
 
   const handleSaveTransaction = (transaction: Transaction) => {
-    setTransactions((prev) => [transaction, ...prev]);
+    setTransactions((prev) => {
+      const updated = [transaction, ...prev];
+      saveStoredTransactions(updated);
+      return updated;
+    });
     syncUpsertTransaction(transaction);
   };
 
   const handleDeleteTransaction = (id: string) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+    setTransactions((prev) => {
+      const updated = prev.filter((t) => t.id !== id);
+      saveStoredTransactions(updated);
+      return updated;
+    });
     syncDeleteTransaction(id);
   };
 
@@ -291,7 +307,7 @@ export function App() {
 
   return (
     <div className="app-container">
-      {/* Toast de notificaÃ§Ã£o de sincronizaÃ§Ã£o */}
+      {/* Toast de notificação de sincronização */}
       {toast && (
         <div style={{
           position: 'fixed',
@@ -314,7 +330,7 @@ export function App() {
 
       <BrowserRouter>
         <Routes>
-          {/* PÃ¡gina pÃºblica do cliente */}
+          {/* Página pública do cliente */}
           <Route
             path="/"
             element={
@@ -330,7 +346,7 @@ export function App() {
             }
           />
 
-          {/* PÃ¡gina administrativa (protegida por autenticaÃ§Ã£o) */}
+          {/* Página administrativa (protegida por autenticação) */}
           <Route
             path="/admin"
             element={
