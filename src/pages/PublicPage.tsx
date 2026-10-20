@@ -3,6 +3,7 @@ import { Globe, Lock, RefreshCw, Database } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
 import { syncFromSupabase, isSupabaseConnected } from '../utils/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface PublicPageProps {
   services: any[];
@@ -23,6 +24,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   setIsAppointmentModalOpen,
   setIsAdminAuthenticated,
 }) => {
+  const navigate = useNavigate();
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
   const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
 
@@ -62,7 +64,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
                   Agendamento Online
                 </h1>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.25rem' }}>
-                  PÃ¡gina pÃºblica da cliente - agende sem acesso ao painel administrativo
+                  Página pública da cliente - agende sem acesso ao painel administrativo
                 </p>
               </div>
             </div>
@@ -87,8 +89,8 @@ export const PublicPage: React.FC<PublicPageProps> = ({
             }}>
               <Database size={16} />
               <span>
-                Banco de dados nÃ£o conectado. As ediÃ§Ãµes do admin ficam sÃ³ neste navegador.
-                Conecte o Supabase para sincronizar com a pÃ¡gina do cliente.
+                Banco de dados não conectado. As edições do admin ficam só neste navegador.
+                Conecte o Supabase para sincronizar com a página do cliente.
               </span>
             </div>
           )}
@@ -111,7 +113,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
               }}
             >
               <RefreshCw size={16} />
-              Atualizar ServiÃ§os
+              Atualizar Serviços
             </button>
 
             <button
@@ -156,6 +158,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
             onLogin={() => {
               setIsAdminAuthenticated(true);
               setLocalLoginModalOpen(false);
+              navigate('/admin');
             }}
           />
         </div>
