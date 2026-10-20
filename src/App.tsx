@@ -20,7 +20,8 @@ import {
   syncUpdateAppointmentStatus,
   syncDeleteAppointment,
   syncUpsertTransaction,
-  syncDeleteTransaction
+  syncDeleteTransaction,
+  subscribeToServiceChanges
 } from './utils/supabase';
 import type { 
   Client, 
@@ -112,6 +113,19 @@ export function App() {
   useEffect(() => {
     syncWithSupabase();
   }, [syncWithSupabase]);
+
+  // Inscricao em tempo real no Supabase: pagina do cliente atualiza quando admin edita servicos
+  useEffect(() => {
+    if (!isSupabaseConnected()) return;
+
+    const unsubscribe = subscribeToServiceChanges((newServices) => {
+      setServices(newServices);
+      saveStoredServices(newServices);
+      setToast({ message: 'Servicos atualizados em tempo real', type: 'success' });
+    });
+
+    return () => unsubscribe();
+  }, [isSupabaseConnected()]);
 
   // Save to localStorage when state changes
   useEffect(() => {
@@ -284,7 +298,7 @@ export function App() {
     });
     const result = await syncUpsertService(service);
     if (result.ok) {
-      setToast({ message: 'Serviço salvo no banco de dados', type: 'success' });
+      setToast({ message: 'ServiÃ§o salvo no banco de dados', type: 'success' });
     } else {
       setToast({ message: `Erro ao salvar no banco: ${result.error}`, type: 'error' });
     }
@@ -295,7 +309,7 @@ export function App() {
     setServices(prev => prev.filter(s => s.id !== id));
     const result = await syncDeleteService(id);
     if (result.ok) {
-      setToast({ message: 'Serviço removido do banco de dados', type: 'success' });
+      setToast({ message: 'ServiÃ§o removido do banco de dados', type: 'success' });
     } else {
       setToast({ message: `Erro ao remover do banco: ${result.error}`, type: 'error' });
     }
@@ -320,7 +334,7 @@ export function App() {
     }
   }, [toast]);
 
-  // Escutar mudanças no localStorage (quando admin salva em outra aba)
+  // Escutar mudanÃ§as no localStorage (quando admin salva em outra aba)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'bellanail_services_v1' || e.key === 'bellanail_clients_v1') {
@@ -329,7 +343,7 @@ export function App() {
           const newClients = e.key === 'bellanail_clients_v1' ? JSON.parse(e.newValue || '[]') : null;
           if (newServices) setServices(newServices);
           if (newClients) setClients(newClients);
-          setToast({ message: 'Serviços atualizados automaticamente', type: 'success' });
+          setToast({ message: 'ServiÃ§os atualizados automaticamente', type: 'success' });
         } catch {
           // ignorar parse errors
         }
@@ -347,7 +361,7 @@ export function App() {
     <div className="app-container">
       {!isAdminAuthenticated ? (
         <>
-        /* ============ VISÃO PÚBLICA DO CLIENTE (sem login) ============ */
+        /* ============ VISÃƒO PÃšBLICA DO CLIENTE (sem login) ============ */
         <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
           <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
             <div className="public-view-card" style={{
@@ -367,7 +381,7 @@ export function App() {
                     Agendamento Online
                   </h1>
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.25rem' }}>
-                    Página pública da cliente - agende sem acesso ao painel administrativo
+                    PÃ¡gina pÃºblica da cliente - agende sem acesso ao painel administrativo
                   </p>
                 </div>
               </div>
@@ -416,7 +430,7 @@ export function App() {
                 }}
               >
                 <RefreshCw size={16} />
-                Atualizar Serviços
+                Atualizar ServiÃ§os
               </button>
 
               {!isAdminAuthenticated && (
@@ -449,7 +463,7 @@ export function App() {
           </div>
         </div>
 
-        {/* Login como popup sobre a visão pública */}
+        {/* Login como popup sobre a visÃ£o pÃºblica */}
         {isLoginModalOpen && (
           <div style={{
             position: 'fixed',
@@ -470,7 +484,7 @@ export function App() {
         )}
         </>
       ) : (
-        /* ============ PAINEL ADMINISTRATIVO (após login) ============ */
+        /* ============ PAINEL ADMINISTRATIVO (apÃ³s login) ============ */
         <>
           <Sidebar
             activeTab={activeTab}
