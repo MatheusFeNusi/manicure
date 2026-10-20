@@ -330,6 +330,27 @@ export function App() {
         }}>
           {toast.message}
         </div>
+        )}
+
+      {/* Banner de aviso quando Supabase não está conectado */}
+      {!hasSupabase && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          background: '#fff3cd',
+          color: '#856404',
+          padding: '0.75rem 1rem',
+          fontWeight: 700,
+          fontSize: '0.9rem',
+          zIndex: 2000,
+          textAlign: 'center',
+          borderBottom: '1px solid #ffeeba'
+        }}>
+          ⚠️ Supabase não conectado. As alterações são salvas apenas localmente.
+          Configure o Supabase para salvar no banco de dados e sincronizar com a página do cliente.
+        </div>
       )}
 
       <BrowserRouter>
