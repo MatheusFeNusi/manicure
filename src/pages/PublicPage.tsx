@@ -2,7 +2,7 @@ import React from 'react';
 import { Globe, Lock, RefreshCw, Database } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
-import { syncWithSupabase, isSupabaseConnected } from '../utils/supabase';
+import { syncFromSupabase, isSupabaseConnected } from '../utils/supabase';
 
 interface PublicPageProps {
   services: any[];
@@ -29,7 +29,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const handleSync = async () => {
     if (!isSupabaseConnected()) return;
     try {
-      const data = await syncWithSupabase();
+      const data = await syncFromSupabase();
       if (data?.services) setServices(data.services);
       if (data?.clients) setClients(data.clients);
     } catch {
