@@ -14,7 +14,7 @@ interface PublicPageProps {
 }
 
 export const PublicPage: React.FC<PublicPageProps> = ({
-  services,
+  services: servicesProp,
   onAppointmentBooked,
   setIsServiceModalOpen,
   setIsAppointmentModalOpen,
@@ -23,24 +23,48 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const navigate = useNavigate();
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
   const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
-  const [toast, setToast] = React.useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [services, setServices] = React.useState(servicesProp);
 
-  // FORÇAR leitura do localStorage ao montar a página do cliente
+  // Sincronizar services prop sempre que mudar (mesma aba)
+  React.useEffect(() => {
+    setServices(servicesProp);
+  }, [servicesProp]);
+
+  // Ler localStorage ao montar (aba separada ou refresh)
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem('bellanail_services_v1');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.length > 0) {
-          // Usar dados do localStorage se estiverem disponíveis
+          setServices(parsed);
         }
       }
     } catch { /* ignore */ }
   }, []);
 
+  // Escutar mudanças no localStorage feitas pelo admin em outra aba
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'bellanail_services_v1') {
+        try {
+          const newServices = JSON.parse(e.newValue || '[]');
+          if (newServices && newServices.length > 0) {
+            setServices(newServices);
+            setToast({ message: 'Serviços atualizados pelo admin', type: 'success' });
+          }
+        } catch { /* ignore */ }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   React.useEffect(() => {
     setHasSupabase(isSupabaseConnected());
   }, []);
+
+  const [toast, setToast] = React.useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Auto-dismiss toast
   React.useEffect(() => {
@@ -56,6 +80,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.length > 0) {
+          setServices(parsed);
           setToast({ message: 'Serviços atualizados', type: 'success' });
         }
       }
