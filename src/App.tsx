@@ -1,15 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  getStoredClients, 
-  saveStoredClients, 
-  getStoredServices, 
-  saveStoredServices, 
-  getStoredAppointments, 
-  saveStoredAppointments, 
-  getStoredTransactions, 
-  saveStoredTransactions 
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  getStoredClients,
+  saveStoredClients,
+  getStoredServices,
+  saveStoredServices,
+  getStoredAppointments,
+  saveStoredAppointments,
+  getStoredTransactions,
+  saveStoredTransactions,
 } from './utils/storage';
-import { 
+import {
   isSupabaseConnected,
   syncFromSupabase,
   syncUpsertClient,
@@ -21,33 +22,20 @@ import {
   syncDeleteAppointment,
   syncUpsertTransaction,
   syncDeleteTransaction,
-  subscribeToServiceChanges
+  subscribeToServiceChanges,
 } from './utils/supabase';
-import type { 
-  Client, 
-  Service, 
-  Appointment, 
-  Transaction, 
-  ActiveTab, 
-  AppointmentStatus 
+import type {
+  Client,
+  Service,
+  Appointment,
+  Transaction,
+  AppointmentStatus,
 } from './types';
-import { Globe, Lock, RefreshCw, Database } from 'lucide-react';
+import { Database } from 'lucide-react';
 
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { DashboardView } from './components/DashboardView';
-import { AgendaView } from './components/AgendaView';
-import { ServicesView } from './components/ServicesView';
-import { ClientsView } from './components/ClientsView';
-import { FinanceView } from './components/FinanceView';
-import { OnlineBookingView } from './components/OnlineBookingView';
+import { PublicPage } from './pages/PublicPage';
+import { AdminPage } from './pages/AdminPage';
 
-import { NewAppointmentModal } from './components/NewAppointmentModal';
-import { NewClientModal } from './components/NewClientModal';
-import { NewServiceModal } from './components/NewServiceModal';
-import { NewTransactionModal } from './components/NewTransactionModal';
-import { SupabaseConfigModal } from './components/SupabaseConfigModal';
-import { LoginView } from './components/LoginView';
 import './App.css';
 
 export function App() {
@@ -57,33 +45,18 @@ export function App() {
   const [appointments, setAppointments] = useState<Appointment[]>(getStoredAppointments);
   const [transactions, setTransactions] = useState<Transaction[]>(getStoredTransactions);
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasSupabase, setHasSupabase] = useState(isSupabaseConnected());
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  useEffect(() => {
-    const stored = localStorage.getItem('bellanail_admin_auth');
-    if (stored === 'true') {
-      setIsAdminAuthenticated(true);
-    }
-  }, []);
-
-  const handleAdminLogout = () => {
-    localStorage.removeItem('bellanail_admin_auth');
-    setIsAdminAuthenticated(false);
-    setActiveTab('agendamento_online');
-  };
-
   // Modals state
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
-
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
-
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -91,7 +64,7 @@ export function App() {
   // Sync from Supabase on mount or when connected
   const syncWithSupabase = useCallback(async () => {
     if (!isSupabaseConnected()) {
-      setToast({ message: 'Supabase nao conectado. Configure em Configuracoes.', type: 'error' });
+      setToast({ message: 'Supabase nÃ£o conectado. Configure em ConfiguraÃ§Ãµes.', type: 'error' });
       return;
     }
     try {
@@ -114,39 +87,47 @@ export function App() {
     syncWithSupabase();
   }, [syncWithSupabase]);
 
-  // Inscricao em tempo real no Supabase: pagina do cliente atualiza quando admin edita servicos
+  // InscriÃ§Ã£o em tempo real no Supabase: pÃ¡gina do cliente atualiza quando admin edita serviÃ§os
   useEffect(() => {
     if (!isSupabaseConnected()) return;
 
     const unsubscribe = subscribeToServiceChanges((newServices) => {
       setServices(newServices);
       saveStoredServices(newServices);
-      setToast({ message: 'Servicos atualizados em tempo real', type: 'success' });
+      setToast({ message: 'ServiÃ§os atualizados em tempo real', type: 'success' });
     });
 
     return () => unsubscribe();
   }, [isSupabaseConnected()]);
 
   // Save to localStorage when state changes
-  useEffect(() => {
-    saveStoredClients(clients);
-  }, [clients]);
+  useEffect(() => { saveStoredClients(clients); }, [clients]);
+  useEffect(() => { saveStoredServices(services); }, [services]);
+  useEffect(() => { saveStoredAppointments(appointments); }, [appointments]);
+  useEffect(() => { saveStoredTransactions(transactions); }, [transactions]);
 
+  // Escutar mudanÃ§as no localStorage (quando admin salva em outra aba)
   useEffect(() => {
-    saveStoredServices(services);
-  }, [services]);
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'bellanail_services_v1' || e.key === 'bellanail_clients_v1') {
+        try {
+          if (e.key === 'bellanail_services_v1') {
+            setServices(JSON.parse(e.newValue || '[]'));
+          }
+          if (e.key === 'bellanail_clients_v1') {
+            setClients(JSON.parse(e.newValue || '[]'));
+          }
+          setToast({ message: 'ServiÃ§os atualizados automaticamente', type: 'success' });
+        } catch { /* ignore */ }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
-  useEffect(() => {
-    saveStoredAppointments(appointments);
-  }, [appointments]);
-
-  useEffect(() => {
-    saveStoredTransactions(transactions);
-  }, [transactions]);
-
-  // Handlers for Appointments
+  // Handlers
   const handleSaveAppointment = (
-    aptData: Partial<Appointment>, 
+    aptData: Partial<Appointment>,
     newClientData?: Partial<Client>
   ) => {
     let createdClient: Client | null = null;
@@ -161,24 +142,26 @@ export function App() {
         totalSpent: aptData.totalAmount || 0,
         totalAppointments: 1,
         lastVisit: aptData.date || new Date().toISOString().split('T')[0],
-        createdAt: new Date().toISOString().split('T')[0]
+        createdAt: new Date().toISOString().split('T')[0],
       };
-      setClients(prev => [createdClient!, ...prev]);
+      setClients((prev) => [createdClient!, ...prev]);
       syncUpsertClient(createdClient);
     } else if (aptData.clientId) {
-      setClients(prev => prev.map(c => {
-        if (c.id === aptData.clientId) {
-          const updated = {
-            ...c,
-            totalAppointments: c.totalAppointments + 1,
-            totalSpent: c.totalSpent + (aptData.totalAmount || 0),
-            lastVisit: aptData.date || c.lastVisit
-          };
-          syncUpsertClient(updated);
-          return updated;
-        }
-        return c;
-      }));
+      setClients((prev) =>
+        prev.map((c) => {
+          if (c.id === aptData.clientId) {
+            const updated = {
+              ...c,
+              totalAppointments: c.totalAppointments + 1,
+              totalSpent: c.totalSpent + (aptData.totalAmount || 0),
+              lastVisit: aptData.date || c.lastVisit,
+            };
+            syncUpsertClient(updated);
+            return updated;
+          }
+          return c;
+        })
+      );
     }
 
     const newAppointment: Appointment = {
@@ -196,10 +179,10 @@ export function App() {
       paymentMethod: aptData.paymentMethod || 'Pix',
       paymentStatus: aptData.paymentStatus || 'pendente',
       notes: aptData.notes,
-      nailColorPreference: aptData.nailColorPreference
+      nailColorPreference: aptData.nailColorPreference,
     };
 
-    setAppointments(prev => [newAppointment, ...prev]);
+    setAppointments((prev) => [newAppointment, ...prev]);
     if (newAppointment.serviceIds && newAppointment.serviceIds[0]) {
       syncCreateAppointment(
         newAppointment.clientName,
@@ -212,69 +195,73 @@ export function App() {
   };
 
   const handleUpdateAppointmentStatus = (id: string, newStatus: AppointmentStatus) => {
-    setAppointments(prev => prev.map(apt => {
-      if (apt.id === id) {
-        const updated = { ...apt, status: newStatus };
-        
-        if (newStatus === 'concluido' && apt.paymentStatus !== 'pago') {
-          updated.paymentStatus = 'pago';
-          const newTx: Transaction = {
-            id: 'tx-' + Date.now(),
-            type: 'receita',
-            category: 'Atendimento',
-            description: `Atendimento ${apt.clientName} (${apt.servicesSummary})`,
-            amount: apt.totalAmount,
-            date: apt.date,
-            paymentMethod: apt.paymentMethod === 'Pendente' ? 'Pix' : apt.paymentMethod,
-            appointmentId: apt.id
-          };
-          setTransactions(tPrev => [newTx, ...tPrev]);
-          syncUpsertTransaction(newTx);
+    setAppointments((prev) =>
+      prev.map((apt) => {
+        if (apt.id === id) {
+          const updated = { ...apt, status: newStatus };
+
+          if (newStatus === 'concluido' && apt.paymentStatus !== 'pago') {
+            updated.paymentStatus = 'pago';
+            const newTx: Transaction = {
+              id: 'tx-' + Date.now(),
+              type: 'receita',
+              category: 'Atendimento',
+              description: `Atendimento ${apt.clientName} (${apt.servicesSummary})`,
+              amount: apt.totalAmount,
+              date: apt.date,
+              paymentMethod: apt.paymentMethod === 'Pendente' ? 'Pix' : apt.paymentMethod,
+              appointmentId: apt.id,
+            };
+            setTransactions((tPrev) => [newTx, ...tPrev]);
+            syncUpsertTransaction(newTx);
+          }
+          syncUpdateAppointmentStatus(id, newStatus);
+          return updated;
         }
-        syncUpdateAppointmentStatus(id, newStatus);
-        return updated;
-      }
-      return apt;
-    }));
+        return apt;
+      })
+    );
   };
 
   const handleTogglePaymentStatus = (id: string) => {
-    setAppointments(prev => prev.map(apt => {
-      if (apt.id === id) {
-        const nextStatus: 'pago' | 'pendente' = apt.paymentStatus === 'pago' ? 'pendente' : 'pago';
-        if (nextStatus === 'pago') {
-          const newTx: Transaction = {
-            id: 'tx-' + Date.now(),
-            type: 'receita',
-            category: 'Atendimento',
-            description: `Recebimento ${apt.clientName} (${apt.servicesSummary})`,
-            amount: apt.totalAmount,
-            date: apt.date,
-            paymentMethod: apt.paymentMethod === 'Pendente' ? 'Pix' : apt.paymentMethod,
-            appointmentId: apt.id
-          };
-          setTransactions(tPrev => [newTx, ...tPrev]);
-          syncUpsertTransaction(newTx);
+    setAppointments((prev) =>
+      prev.map((apt) => {
+        if (apt.id === id) {
+          const nextStatus: 'pago' | 'pendente' =
+            apt.paymentStatus === 'pago' ? 'pendente' : 'pago';
+          if (nextStatus === 'pago') {
+            const newTx: Transaction = {
+              id: 'tx-' + Date.now(),
+              type: 'receita',
+              category: 'Atendimento',
+              description: `Recebimento ${apt.clientName} (${apt.servicesSummary})`,
+              amount: apt.totalAmount,
+              date: apt.date,
+              paymentMethod: apt.paymentMethod === 'Pendente' ? 'Pix' : apt.paymentMethod,
+              appointmentId: apt.id,
+            };
+            setTransactions((tPrev) => [newTx, ...tPrev]);
+            syncUpsertTransaction(newTx);
+          }
+          const updated = { ...apt, paymentStatus: nextStatus };
+          syncUpdateAppointmentStatus(apt.id, apt.status);
+          return updated;
         }
-        const updated = { ...apt, paymentStatus: nextStatus };
-        syncUpdateAppointmentStatus(apt.id, apt.status);
-        return updated;
-      }
-      return apt;
-    }));
+        return apt;
+      })
+    );
   };
 
   const handleDeleteAppointment = (id: string) => {
-    setAppointments(prev => prev.filter(a => a.id !== id));
+    setAppointments((prev) => prev.filter((a) => a.id !== id));
     syncDeleteAppointment(id);
   };
 
-  // Handlers for Clients
   const handleSaveClient = (client: Client) => {
-    setClients(prev => {
-      const exists = prev.some(c => c.id === client.id);
+    setClients((prev) => {
+      const exists = prev.some((c) => c.id === client.id);
       if (exists) {
-        return prev.map(c => c.id === client.id ? client : c);
+        return prev.map((c) => (c.id === client.id ? client : c));
       }
       return [client, ...prev];
     });
@@ -283,16 +270,15 @@ export function App() {
   };
 
   const handleDeleteClient = (id: string) => {
-    setClients(prev => prev.filter(c => c.id !== id));
+    setClients((prev) => prev.filter((c) => c.id !== id));
     syncDeleteClient(id);
   };
 
-  // Handlers for Services
   const handleSaveService = async (service: Service) => {
-    setServices(prev => {
-      const exists = prev.some(s => s.id === service.id);
+    setServices((prev) => {
+      const exists = prev.some((s) => s.id === service.id);
       if (exists) {
-        return prev.map(s => s.id === service.id ? service : s);
+        return prev.map((s) => (s.id === service.id ? service : s));
       }
       return [service, ...prev];
     });
@@ -306,7 +292,7 @@ export function App() {
   };
 
   const handleDeleteService = async (id: string) => {
-    setServices(prev => prev.filter(s => s.id !== id));
+    setServices((prev) => prev.filter((s) => s.id !== id));
     const result = await syncDeleteService(id);
     if (result.ok) {
       setToast({ message: 'ServiÃ§o removido do banco de dados', type: 'success' });
@@ -315,15 +301,19 @@ export function App() {
     }
   };
 
-  // Handlers for Transactions
   const handleSaveTransaction = (transaction: Transaction) => {
-    setTransactions(prev => [transaction, ...prev]);
+    setTransactions((prev) => [transaction, ...prev]);
     syncUpsertTransaction(transaction);
   };
 
   const handleDeleteTransaction = (id: string) => {
-    setTransactions(prev => prev.filter(t => t.id !== id));
+    setTransactions((prev) => prev.filter((t) => t.id !== id));
     syncDeleteTransaction(id);
+  };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('bellanail_admin_auth');
+    setIsAdminAuthenticated(false);
   };
 
   // Auto-dismiss toast
@@ -334,308 +324,12 @@ export function App() {
     }
   }, [toast]);
 
-  // Escutar mudanÃ§as no localStorage (quando admin salva em outra aba)
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'bellanail_services_v1' || e.key === 'bellanail_clients_v1') {
-        try {
-          const newServices = e.key === 'bellanail_services_v1' ? JSON.parse(e.newValue || '[]') : null;
-          const newClients = e.key === 'bellanail_clients_v1' ? JSON.parse(e.newValue || '[]') : null;
-          if (newServices) setServices(newServices);
-          if (newClients) setClients(newClients);
-          setToast({ message: 'ServiÃ§os atualizados automaticamente', type: 'success' });
-        } catch {
-          // ignorar parse errors
-        }
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  // Appointments today count
   const todayStr = new Date().toISOString().split('T')[0];
-  const todayAppointmentsCount = appointments.filter(a => a.date === todayStr).length;
+  const todayAppointmentsCount = appointments.filter((a) => a.date === todayStr).length;
 
   return (
     <div className="app-container">
-      {!isAdminAuthenticated ? (
-        <>
-        /* ============ VISÃƒO PÃšBLICA DO CLIENTE (sem login) ============ */
-        <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
-          <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
-            <div className="public-view-card" style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '2rem',
-              boxShadow: 'var(--shadow-lg)',
-              marginBottom: '2rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ background: 'var(--primary-light)', padding: '0.5rem', borderRadius: '10px', color: 'var(--primary)' }}>
-                  <Globe size={22} />
-                </div>
-                <div>
-                  <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, fontFamily: 'var(--font-serif)' }}>
-                    Agendamento Online
-                  </h1>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.25rem' }}>
-                    PÃ¡gina pÃºblica da cliente - agende sem acesso ao painel administrativo
-                  </p>
-                </div>
-              </div>
-              <OnlineBookingView
-                services={services}
-                onAppointmentBooked={handleSaveAppointment}
-              />
-            </div>
-
-            {!isSupabaseConnected && (
-              <div style={{
-                background: '#fff8e1',
-                border: '1px solid #ffe0b2',
-                color: '#e65100',
-                padding: '1rem 1.25rem',
-                borderRadius: 'var(--radius-md)',
-                marginTop: '1.5rem',
-                fontSize: '0.875rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.6rem'
-              }}>
-                <Database size={16} />
-                <span>
-                  Banco de dados nao conectado. As edicoes do admin ficam so neste navegador.
-                  Conecte o Supabase para sincronizar com a pagina do cliente.
-                </span>
-              </div>
-            )}
-
-            <div style={{ textAlign: 'center', gap: '0.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <button
-                onClick={syncWithSupabase}
-                className="btn btn-secondary"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontWeight: 700,
-                  border: '1px solid var(--primary)',
-                  color: 'var(--primary)',
-                  background: 'transparent',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: 'var(--radius-md)',
-                  maxWidth: '320px'
-                }}
-              >
-                <RefreshCw size={16} />
-                Atualizar ServiÃ§os
-              </button>
-
-              {!isAdminAuthenticated && (
-                <button
-                  onClick={() => {
-                    setIsServiceModalOpen(false);
-                    setIsAppointmentModalOpen(false);
-                    setIsLoginModalOpen(true);
-                  }}
-                  className="btn btn-secondary"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    fontWeight: 700,
-                    border: '1px solid var(--primary)',
-                    color: 'var(--primary)',
-                    background: 'transparent',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: 'var(--radius-md)',
-                    maxWidth: '320px',
-                    marginTop: '0.75rem'
-                  }}
-                >
-                  <Lock size={18} style={{ marginRight: '0.4rem' }} />
-                  Acessar Painel Administrativo
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Login como popup sobre a visÃ£o pÃºblica */}
-        {isLoginModalOpen && (
-          <div style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 2000,
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <LoginView
-              onLogin={() => {
-                setIsAdminAuthenticated(true);
-                setIsLoginModalOpen(false);
-              }}
-            />
-          </div>
-        )}
-        </>
-      ) : (
-        /* ============ PAINEL ADMINISTRATIVO (apÃ³s login) ============ */
-        <>
-          <Sidebar
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
-            todayAppointmentsCount={todayAppointmentsCount}
-          />
-
-          <div className="main-wrapper">
-            <Header
-              activeTab={activeTab}
-              onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
-              onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
-              onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
-              onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
-              onForceSync={syncWithSupabase}
-              onLogout={handleAdminLogout}
-              isSupabaseConnected={hasSupabase}
-              isAdminAuthenticated={isAdminAuthenticated}
-            />
-
-            <main className="content-body">
-              {activeTab === 'dashboard' && (
-                <DashboardView
-                  appointments={appointments}
-                  clients={clients}
-                  services={services}
-                  transactions={transactions}
-                  onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
-                  onOpenNewClient={() => {
-                    setClientToEdit(null);
-                    setIsClientModalOpen(true);
-                  }}
-                  onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
-                  onUpdateAppointmentStatus={handleUpdateAppointmentStatus}
-                  onSelectTab={setActiveTab}
-                />
-              )}
-
-              {activeTab === 'agenda' && (
-                <AgendaView
-                  appointments={appointments}
-                  clients={clients}
-                  services={services}
-                  onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
-                  onUpdateStatus={handleUpdateAppointmentStatus}
-                  onTogglePaymentStatus={handleTogglePaymentStatus}
-                  onDeleteAppointment={handleDeleteAppointment}
-                />
-              )}
-
-              {activeTab === 'servicos' && (
-                <ServicesView
-                  services={services}
-                  onOpenNewService={() => {
-                    setServiceToEdit(null);
-                    setIsServiceModalOpen(true);
-                  }}
-                  onEditService={srv => {
-                    setServiceToEdit(srv);
-                    setIsServiceModalOpen(true);
-                  }}
-                  onDeleteService={handleDeleteService}
-                />
-              )}
-
-              {activeTab === 'clientes' && (
-                <ClientsView
-                  clients={clients}
-                  onOpenNewClient={() => {
-                    setClientToEdit(null);
-                    setIsClientModalOpen(true);
-                  }}
-                  onEditClient={client => {
-                    setClientToEdit(client);
-                    setIsClientModalOpen(true);
-                  }}
-                  onDeleteClient={handleDeleteClient}
-                  onScheduleForClient={_client => {
-                    setIsAppointmentModalOpen(true);
-                  }}
-                />
-              )}
-
-              {activeTab === 'financeiro' && (
-                <FinanceView
-                  transactions={transactions}
-                  onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
-                  onDeleteTransaction={handleDeleteTransaction}
-                />
-              )}
-
-              {activeTab === 'agendamento_online' && (
-                <OnlineBookingView
-                  services={services}
-                  onAppointmentBooked={apt => {
-                    handleSaveAppointment(apt);
-                  }}
-                />
-              )}
-            </main>
-          </div>
-
-          {/* Modals */}
-          <NewAppointmentModal
-            isOpen={isAppointmentModalOpen}
-            onClose={() => setIsAppointmentModalOpen(false)}
-            onSave={handleSaveAppointment}
-            clients={clients}
-            services={services}
-          />
-
-          <NewClientModal
-            isOpen={isClientModalOpen}
-            onClose={() => {
-              setIsClientModalOpen(false);
-              setClientToEdit(null);
-            }}
-            onSave={handleSaveClient}
-            initialData={clientToEdit}
-          />
-
-          <NewServiceModal
-            isOpen={isServiceModalOpen}
-            onClose={() => {
-              setIsServiceModalOpen(false);
-              setServiceToEdit(null);
-            }}
-            onSave={handleSaveService}
-            initialData={serviceToEdit}
-          />
-
-          <NewTransactionModal
-            isOpen={isTransactionModalOpen}
-            onClose={() => setIsTransactionModalOpen(false)}
-            onSave={handleSaveTransaction}
-          />
-
-          <SupabaseConfigModal
-            isOpen={isSupabaseModalOpen}
-            onClose={() => setIsSupabaseModalOpen(false)}
-            onConnected={() => {
-              setHasSupabase(isSupabaseConnected());
-              syncWithSupabase();
-            }}
-          />
-        </>
-      )}
-
-      {/* Toast de notificacao de sincronizacao */}
+      {/* Toast de notificaÃ§Ã£o de sincronizaÃ§Ã£o */}
       {toast && (
         <div style={{
           position: 'fixed',
@@ -650,11 +344,89 @@ export function App() {
           zIndex: 1000,
           background: toast.type === 'success' ? '#2e7d32' : '#b3261e',
           border: '1px solid rgba(255,255,255,0.3)',
-          animation: 'slideIn 0.3s ease-out'
+          animation: 'slideIn 0.3s ease-out',
         }}>
           {toast.message}
         </div>
       )}
+
+      <BrowserRouter>
+        <Routes>
+          {/* PÃ¡gina pÃºblica do cliente */}
+          <Route
+            path="/"
+            element={
+              <PublicPage
+                services={services}
+                onAppointmentBooked={handleSaveAppointment}
+                setServices={setServices}
+                setClients={setClients}
+                setIsServiceModalOpen={setIsServiceModalOpen}
+                setIsAppointmentModalOpen={setIsAppointmentModalOpen}
+                setIsLoginModalOpen={setIsLoginModalOpen}
+                setIsAdminAuthenticated={setIsAdminAuthenticated}
+              />
+            }
+          />
+
+          {/* PÃ¡gina administrativa (protegida por autenticaÃ§Ã£o) */}
+          <Route
+            path="/admin"
+            element={
+              isAdminAuthenticated ? (
+                <AdminPage
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  isMobileMenuOpen={isMobileMenuOpen}
+                  setIsMobileMenuOpen={setIsMobileMenuOpen}
+                  todayAppointmentsCount={todayAppointmentsCount}
+                  appointments={appointments}
+                  clients={clients}
+                  services={services}
+                  transactions={transactions}
+                  onOpenNewAppointment={() => setIsAppointmentModalOpen(true)}
+                  onOpenNewClient={() => {
+                    setClientToEdit(null);
+                    setIsClientModalOpen(true);
+                  }}
+                  onOpenNewTransaction={() => setIsTransactionModalOpen(true)}
+                  onUpdateAppointmentStatus={handleUpdateAppointmentStatus}
+                  onSelectTab={setActiveTab}
+                  onOpenOnlineBooking={() => setActiveTab('agendamento_online')}
+                  onOpenSupabaseConfig={() => setIsSupabaseModalOpen(true)}
+                  onForceSync={syncWithSupabase}
+                  onLogout={handleAdminLogout}
+                  isSupabaseConnected={hasSupabase}
+                  isAdminAuthenticated={isAdminAuthenticated}
+                  isAppointmentModalOpen={isAppointmentModalOpen}
+                  setIsAppointmentModalOpen={setIsAppointmentModalOpen}
+                  isClientModalOpen={isClientModalOpen}
+                  setIsClientModalOpen={setIsClientModalOpen}
+                  clientToEdit={clientToEdit}
+                  setClientToEdit={setClientToEdit}
+                  isServiceModalOpen={isServiceModalOpen}
+                  setIsServiceModalOpen={setIsServiceModalOpen}
+                  serviceToEdit={serviceToEdit}
+                  setServiceToEdit={setServiceToEdit}
+                  isTransactionModalOpen={isTransactionModalOpen}
+                  setIsTransactionModalOpen={setIsTransactionModalOpen}
+                  isSupabaseModalOpen={isSupabaseModalOpen}
+                  setIsSupabaseModalOpen={setIsSupabaseModalOpen}
+                  handleSaveAppointment={handleSaveAppointment}
+                  handleSaveClient={handleSaveClient}
+                  handleDeleteClient={handleDeleteClient}
+                  handleSaveService={handleSaveService}
+                  handleDeleteService={handleDeleteService}
+                  handleSaveTransaction={handleSaveTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
