@@ -59,7 +59,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
         justifyContent: 'space-between',
         gap: '1rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: '260px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 'auto' }}>
           <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
             <input
