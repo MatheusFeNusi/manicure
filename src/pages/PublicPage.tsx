@@ -25,6 +25,35 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
   const [localServices, setLocalServices] = React.useState(servicesProp);
 
+  // Ler serviços do localStorage sempre que montar
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem('bellanail_services_v1');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.length > 0) {
+          setLocalServices(parsed);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Polling periódico: ler localStorage a cada 2 segundos para detectar mudanças do admin
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      try {
+        const stored = localStorage.getItem('bellanail_services_v1');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.length > 0) {
+            setLocalServices(parsed);
+          }
+        }
+      } catch { /* ignore */ }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Escutar mudanças no localStorage feitas pelo admin em outra aba
   React.useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -40,19 +69,6 @@ export const PublicPage: React.FC<PublicPageProps> = ({
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  // FORÇAR leitura do localStorage ao montar a página do cliente
-  React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem('bellanail_services_v1');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.length > 0) {
-          setLocalServices(parsed);
-        }
-      }
-    } catch { /* ignore */ }
   }, []);
 
   React.useEffect(() => {
