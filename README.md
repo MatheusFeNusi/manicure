@@ -9,6 +9,8 @@ Um sistema web completo, moderno e com estética de salão de luxo para gestão 
 
 ---
 
+Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
+
 ## 🌟 Funcionalidades
 
 - **📊 Dashboard & Visão Geral**:
@@ -43,6 +45,8 @@ Um sistema web completo, moderno e com estética de salão de luxo para gestão 
 
 ---
 
+Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **React 19**
@@ -54,6 +58,8 @@ Um sistema web completo, moderno e com estética de salão de luxo para gestão 
 - **LocalStorage** para persistência no navegador
 
 ---
+
+Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
 
 ## 🚀 Como Executar Localmente
 
@@ -76,5 +82,7 @@ Um sistema web completo, moderno e com estética de salão de luxo para gestão 
 4. Abra no seu navegador: `http://localhost:5173/`
 
 ---
+
+Esta aplicação agora é totalmente responsiva, adaptando-se a telas de celular.
 
 Desenvolvido com carinho para elevar a gestão de profissionais da beleza! 💅✨

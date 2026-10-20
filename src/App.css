@@ -982,7 +982,7 @@
 @media (max-width: 480px) {
   /* KPI: 1 coluna em telas muito pequenas */
   .kpi-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .kpi-card {
