@@ -48,7 +48,7 @@ export function App() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
   // Restaurar autenticação do admin ao montar (para permanecer na /admin após F5)
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const stored = localStorage.getItem('bellanail_admin_auth');
       if (stored === 'true') {
