@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, UserPlus, Phone, Calendar, ShieldAlert, Sparkles } from 'lucide-react';
 import type { Client, NailShape } from '../types';
 
@@ -30,6 +30,18 @@ export const NewClientModal: React.FC<NewClientModalProps> = ({
   const [birthDate, setBirthDate] = useState(initialData?.birthDate || '');
   const [nailShape, setNailShape] = useState<NailShape>(initialData?.nailShape || 'Almond');
   const [notes, setNotes] = useState(initialData?.notes || '');
+
+  // Sincroniza os campos sempre que o modal abre ou os dados da cliente mudam
+  useEffect(() => {
+    if (isOpen) {
+      setName(initialData?.name || '');
+      setPhone(initialData?.phone || '');
+      setEmail(initialData?.email || '');
+      setBirthDate(initialData?.birthDate || '');
+      setNailShape(initialData?.nailShape || 'Almond');
+      setNotes(initialData?.notes || '');
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
