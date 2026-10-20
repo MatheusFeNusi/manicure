@@ -19,7 +19,6 @@ import {
   syncDeleteService,
   syncCreateAppointment,
   syncUpdateAppointmentStatus,
-  syncDeleteAppointment,
   syncUpsertTransaction,
   syncDeleteTransaction,
   subscribeToServiceChanges,
