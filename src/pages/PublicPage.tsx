@@ -2,14 +2,12 @@ import React from 'react';
 import { Globe, Lock, RefreshCw, Database } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
-import { syncFromSupabase, isSupabaseConnected } from '../utils/supabase';
+import { isSupabaseConnected } from '../utils/supabase';
 import { useNavigate } from 'react-router-dom';
 
 interface PublicPageProps {
   services: any[];
   onAppointmentBooked: (apt: any) => void;
-  setServices: (s: any[]) => void;
-  setClients: (c: any[]) => void;
   setIsServiceModalOpen: (v: boolean) => void;
   setIsAppointmentModalOpen: (v: boolean) => void;
   setIsAdminAuthenticated: (v: boolean) => void;
@@ -18,8 +16,6 @@ interface PublicPageProps {
 export const PublicPage: React.FC<PublicPageProps> = ({
   services: servicesProp,
   onAppointmentBooked,
-  setServices,
-  setClients,
   setIsServiceModalOpen,
   setIsAppointmentModalOpen,
   setIsAdminAuthenticated,
@@ -37,7 +33,6 @@ export const PublicPage: React.FC<PublicPageProps> = ({
           const newServices = JSON.parse(e.newValue || '[]');
           if (newServices && newServices.length > 0) {
             setLocalServices(newServices);
-            setServices(newServices);
             setToast({ message: 'Serviços atualizados pelo admin', type: 'success' });
           }
         } catch { /* ignore */ }
@@ -55,7 +50,6 @@ export const PublicPage: React.FC<PublicPageProps> = ({
         const parsed = JSON.parse(stored);
         if (parsed && parsed.length > 0) {
           setLocalServices(parsed);
-          setServices(parsed);
         }
       }
     } catch { /* ignore */ }
@@ -74,6 +68,21 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  const handleSync = async () => {
+    try {
+      const stored = localStorage.getItem('bellanail_services_v1');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.length > 0) {
+          setLocalServices(parsed);
+          setToast({ message: 'Serviços atualizados', type: 'success' });
+        }
+      }
+    } catch {
+      setToast({ message: 'Erro ao atualizar serviços', type: 'error' });
+    }
+  };
 
   return (
     <>
