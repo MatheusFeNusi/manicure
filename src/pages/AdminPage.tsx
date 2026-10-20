@@ -147,10 +147,10 @@ export const AdminPage: React.FC<AdminPageProps> = ({
               services={services}
               onOpenNewAppointment={onOpenNewAppointment}
               onUpdateStatus={onUpdateAppointmentStatus}
-              onTogglePaymentStatus={(id: string) => {
+              onTogglePaymentStatus={() => {
                 // placeholder - will be wired in App
               }}
-              onDeleteAppointment={(id: string) => {
+              onDeleteAppointment={() => {
                 // placeholder
               }}
             />
