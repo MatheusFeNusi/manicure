@@ -64,7 +64,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   return (
     <>
       <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
-        <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem' }}>
           <div className="public-view-card" style={{
             background: 'var(--surface)',
             border: '1px solid var(--border-color)',
