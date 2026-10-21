@@ -91,8 +91,24 @@ export const PublicPage: React.FC<PublicPageProps> = ({
 
   return (
     <>
-      <div style={{ minHeight: '100vh', background: 'var(--bg-gradient)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <div style={{
+        minHeight: '100vh',
+        background: 'var(--bg-gradient)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          width: '100%',
+          maxWidth: '1100px',
+          maxHeight: '100vh',
+          overflowY: 'auto',
+          padding: '2rem 1rem',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
           <div className="public-view-card" style={{
             background: 'var(--surface)',
             border: '1px solid var(--border-color)',
