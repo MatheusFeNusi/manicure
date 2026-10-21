@@ -91,14 +91,14 @@ export const PublicPage: React.FC<PublicPageProps> = ({
 
   return (
     <>
-      <div style={{
+      <div className="public-page-container" style={{
         minHeight: '100vh',
         background: 'var(--bg-gradient)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <div style={{
+        <div className="public-page-content" style={{
           width: '100%',
           maxWidth: '1100px',
           maxHeight: '100vh',
