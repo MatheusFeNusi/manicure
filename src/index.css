@@ -414,6 +414,7 @@ input:focus, select:focus, textarea:focus {
 .public-page-main {
   width: 100%;
   max-width: 720px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -612,11 +613,11 @@ input:focus, select:focus, textarea:focus {
 .booking-portal-container {
   width: 100%;
   box-sizing: border-box;
+  margin: 0 auto;
 }
 
 @media (min-width: 769px) {
   .booking-portal-container {
     max-width: 700px;
-    margin: 0 auto;
   }
 }
