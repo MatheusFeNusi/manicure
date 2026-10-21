@@ -12,11 +12,12 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@types/react-router-dom": "^5.3.3",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^1.59.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",

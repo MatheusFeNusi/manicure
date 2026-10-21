@@ -222,7 +222,33 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid var(--border-color);
 }
 
-.btn-secondary:hover { background: var(--surface-hover); border-color: #d8c7cf; }
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: #d8c7cf;
+}
+
+.btn-outline {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.925rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+}
+
+.btn-outline:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-hover);
+}
+
 
 .btn-gold {
   background: linear-gradient(135deg, var(--accent-gold) 0%, #dfa539 100%);
@@ -336,26 +362,261 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.75rem;
     padding: 0.6rem 0.25rem;
   }
+}
 
-  /* Public page: reduz largura e padding em mobile */
-  .public-page-container {
-    align-items: flex-start !important;
-    justify-content: flex-start !important;
-    padding-top: 1rem !important;
-  }
-
-  .public-page-content {
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 1rem 0.75rem !important;
-    max-height: 100% !important;
-    align-items: stretch !important;
-  }
-
-  .public-page-content .public-view-card {
+@media (max-width: 480px) {
+  .public-view-card,
+  .booking-portal-container {
+    border-radius: var(--radius-md) !important;
     padding: 1rem !important;
-    margin: 0 0 1rem 0 !important;
+    margin: 0 0.5rem !important;
     width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  .portal-content {
+    padding: 1rem !important;
+  }
+
+  .portal-banner {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .portal-banner h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .steps-bar, .portal-steps-bar {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .portal-step {
+    flex: none;
+    width: 33%;
+    font-size: 0.75rem;
+    padding: 0.6rem 0.25rem;
+  }
+}
+
+/* ============ PÁGINA PÚBLICA DO CLIENTE — Design Limpo ============ */
+.public-page-wrapper {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.public-page-main {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.public-card {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.public-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.public-icon {
+  background: var(--primary-light);
+  padding: 0.6rem;
+  border-radius: 12px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.public-title-block h1 {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.public-title-block p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0 0;
+  line-height: 1.5;
+}
+
+.public-alert {
+  background: #fff8e1;
+  border: 1px solid #ffe0b2;
+  color: #e65100;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.public-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  align-items: center;
+}
+
+.public-actions .btn {
+  width: 100%;
+  max-width: 340px;
+  justify-content: center;
+  font-weight: 700;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+.public-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  backdrop-filter: blur(4px);
+}
+
+.public-login-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.public-toast {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--radius-full);
+  color: white;
+  font-weight: 700;
+  font-size: 0.925rem;
+  box-shadow: var(--shadow-lg);
+  background: #2e7d32;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ============ Responsividade Página Pública ============ */
+@media (max-width: 768px) {
+  .public-page-wrapper {
+    padding: 1.5rem 1rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 1rem;
+  }
+
+  .public-page-main {
+    max-width: 100%;
+    align-items: stretch;
+  }
+
+  .public-card {
+    padding: 1.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    text-align: left;
+  }
+
+  .public-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .public-title-block h1 {
+    font-size: 1.4rem;
+  }
+
+  .public-alert {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .public-actions .btn {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .public-title-block h1 {
+    font-size: 1.25rem;
+  }
+
+  .public-login-card {
+    max-width: 100%;
+    height: auto;
+    max-height: 95vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .public-toast {
+    font-size: 0.85rem;
+    padding: 0.8rem 1.2rem;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    bottom: 1rem;
+    text-align: center;
+  }
+}
+
+/* Online Booking View: limitar largura no desktop para não quebrar feio */
+.booking-portal-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .booking-portal-container {
+    max-width: 700px;
+    margin: 0 auto;
   }
 }
