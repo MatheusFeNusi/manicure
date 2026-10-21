@@ -406,6 +406,8 @@ input:focus, select:focus, textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  flex: 1 1 100%;
   padding: 2rem 1rem;
   box-sizing: border-box;
   overflow-y: auto;
