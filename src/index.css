@@ -412,13 +412,14 @@ input:focus, select:focus, textarea:focus {
 }
 
 .public-page-main {
-  width: 100%;
   max-width: 720px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  align-self: center;
+  width: auto;
 }
 
 .public-card {
