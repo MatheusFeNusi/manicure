@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Lock, RefreshCw, Database } from 'lucide-react';
+import { Sparkles, Clock, MapPin, Star, Lock } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
 import { isSupabaseConnected } from '../utils/supabase';
@@ -86,55 +86,63 @@ export const PublicPage: React.FC<PublicPageProps> = ({
 
   return (
     <>
-      <div className="public-page-wrapper">
-        <main className="public-page-main">
-          <div className="public-card">
-            <div className="public-header">
-              <div className="public-icon">
-                <Globe size={22} />
-              </div>
-              <div className="public-title-block">
-                <h1>Agendamento Online</h1>
-                <p>Página pública da cliente — agende sem acesso ao painel administrativo</p>
-              </div>
+      <div className="public-page">
+        <header className="studio-header">
+          <div className="studio-logo">
+            <Sparkles size={24} strokeWidth={2} />
+          </div>
+          <div className="studio-info">
+            <h1>Studio BellaNail</h1>
+            <p>Alongamentos, Esmaltação em Gel & Nail Design</p>
+            <div className="studio-meta">
+              <span><Star size={12} fill="#ffd700" color="#ffd700" /> 4.9 (128 avaliações)</span>
+              <span><MapPin size={12} /> São Paulo - SP</span>
+              <span><Clock size={12} /> 09:00 às 19:00</span>
             </div>
+          </div>
+        </header>
 
-            <OnlineBookingView
-              services={services}
-              onAppointmentBooked={onAppointmentBooked}
-            />
+        <main className="public-main">
+          <div className="steps-indicator">
+            <div className="step">1</div>
+            <div className="step">2</div>
+            <div className="step">3</div>
           </div>
 
-          {!hasSupabase && (
-            <div className="public-alert">
-              <Database size={16} />
-              <span>
-                Banco de dados não conectado. As edições do admin ficam só neste navegador. Conecte o Supabase para sincronizar com a página do cliente.
-              </span>
-            </div>
-          )}
-
-          <div className="public-actions">
-            <button
-              className="btn btn-outline"
-              onClick={handleSync}
-            >
-              <RefreshCw size={16} /> Atualizar Serviços
-            </button>
-
-            <button
-              className="btn btn-outline"
-              onClick={() => {
-                setIsServiceModalOpen(false);
-                setIsAppointmentModalOpen(false);
-                setLocalLoginModalOpen(true);
-              }}
-            >
-              <Lock size={18} style={{ marginRight: '0.4rem' }} />
-              Acessar Painel Administrativo
-            </button>
-          </div>
+          <OnlineBookingView
+            services={services}
+            onAppointmentBooked={onAppointmentBooked}
+          />
         </main>
+
+        {!hasSupabase && (
+          <div className="public-alert">
+            <svg className="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span>
+              Banco de dados não conectado. As edições do admin ficam só neste navegador. Conecte o Supabase para sincronizar com a página do cliente.
+            </span>
+          </div>
+        )}
+
+        <div className="public-footer">
+          <a
+            href="/admin"
+            className="admin-link"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsServiceModalOpen(false);
+              setIsAppointmentModalOpen(false);
+              setLocalLoginModalOpen(true);
+            }}
+          >
+            <Lock size={14} style={{ marginRight: '0.35rem' }} />
+            Acessar painel administrativo
+          </a>
+        </div>
 
         {isLoginModalOpen && (
           <div className="public-login-overlay">
