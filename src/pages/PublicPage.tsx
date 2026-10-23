@@ -69,44 +69,37 @@ export const PublicPage: React.FC<PublicPageProps> = ({
     }
   }, [toast]);
 
-  const handleSync = async () => {
-    try {
-      const stored = localStorage.getItem('bellanail_services_v1');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.length > 0) {
-          setServices(parsed);
-          setToast({ message: 'Serviços atualizados', type: 'success' });
-        }
-      }
-    } catch {
-      setToast({ message: 'Erro ao atualizar serviços', type: 'error' });
-    }
-  };
-
   return (
     <>
-      <div className="public-page">
-        <header className="studio-header">
-          <div className="studio-logo">
-            <Sparkles size={24} strokeWidth={2} />
-          </div>
-          <div className="studio-info">
-            <h1>Studio BellaNail</h1>
-            <p>Alongamentos, Esmaltação em Gel & Nail Design</p>
-            <div className="studio-meta">
-              <span><Star size={12} fill="#ffd700" color="#ffd700" /> 4.9 (128 avaliações)</span>
-              <span><MapPin size={12} /> São Paulo - SP</span>
-              <span><Clock size={12} /> 09:00 às 19:00</span>
+      <div className="client-page">
+        <header className="client-header">
+          <div className="brand">
+            <div className="brand-mark">
+              <Sparkles size={20} strokeWidth={2} />
             </div>
+            <div className="brand-text">
+              <h1>BellaNail Studio</h1>
+              <p>Manicure & Nail Design</p>
+            </div>
+          </div>
+          <div className="client-meta">
+            <span className="meta-item">
+              <Star size={12} fill="#c6922b" color="#c6922b" /> 4.9
+            </span>
+            <span className="meta-item">
+              <MapPin size={12} /> São Paulo - SP
+            </span>
+            <span className="meta-item">
+              <Clock size={12} /> 09:00 &ndash; 19:00
+            </span>
           </div>
         </header>
 
-        <main className="public-main">
-          <div className="steps-indicator">
-            <div className="step">1</div>
-            <div className="step">2</div>
-            <div className="step">3</div>
+        <main className="client-main">
+          <div className="client-steps">
+            <div className="step">01</div>
+            <div className="step">02</div>
+            <div className="step">03</div>
           </div>
 
           <OnlineBookingView
@@ -116,22 +109,16 @@ export const PublicPage: React.FC<PublicPageProps> = ({
         </main>
 
         {!hasSupabase && (
-          <div className="public-alert">
-            <svg className="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span>
-              Banco de dados não conectado. As edições do admin ficam só neste navegador. Conecte o Supabase para sincronizar com a página do cliente.
-            </span>
+          <div className="client-notice">
+            <span>Supabase n&atilde;o conectado.</span>
+            <span>As edi&ccedil;&otilde;es ficam s&oacute; neste navegador.</span>
           </div>
         )}
 
-        <div className="public-footer">
+        <footer className="client-footer">
           <a
             href="/admin"
-            className="admin-link"
+            className="client-admin-link"
             onClick={(e) => {
               e.preventDefault();
               setIsServiceModalOpen(false);
@@ -139,14 +126,14 @@ export const PublicPage: React.FC<PublicPageProps> = ({
               setLocalLoginModalOpen(true);
             }}
           >
-            <Lock size={14} style={{ marginRight: '0.35rem' }} />
-            Acessar painel administrativo
+            <Lock size={14} style={{ marginRight: '0.4rem' }} />
+            Painel Administrativo
           </a>
-        </div>
+        </footer>
 
         {isLoginModalOpen && (
-          <div className="public-login-overlay">
-            <div className="public-login-card">
+          <div className="client-login-overlay">
+            <div className="client-login-card">
               <LoginView
                 onLogin={() => {
                   setIsAdminAuthenticated(true);
@@ -159,7 +146,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
         )}
 
         {toast && (
-          <div className="public-toast">
+          <div className="client-toast">
             {toast.message}
           </div>
         )}
