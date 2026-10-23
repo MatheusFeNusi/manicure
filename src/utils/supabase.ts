@@ -1,28 +1,10 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Client, Service, Appointment, Transaction, AppointmentStatus } from '../types';
 
-export const SUPABASE_URL =
-  import.meta.env.VITE_SUPABASE_URL || 'https://etcavgnvcsouujdnrnsf.supabase.co';
-
-const DEFAULT_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0Y2F2Z252Y3NvdXVqZG5ybnNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjQzMTgyNiwiZXhwIjoyMTA4MDA3ODI2fQ.bGNbCXneESfoLU9yBvCcn0xUfXdYQN2bj0jc87ZVwrA';
-
-const STORAGE_KEY_ANON = 'bellanail_supabase_anon_key';
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export const getSupabaseAnonKey = (): string => {
-  const localKey = localStorage.getItem(STORAGE_KEY_ANON);
-  if (localKey && localKey.trim()) return localKey.trim();
-  const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
-  if (envKey) return envKey;
-  return DEFAULT_KEY;
-};
-
-export const setSupabaseAnonKey = (key: string) => {
-  if (key && key.trim()) {
-    localStorage.setItem(STORAGE_KEY_ANON, key.trim());
-  } else {
-    localStorage.removeItem(STORAGE_KEY_ANON);
-  }
+  return import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 };
 
 let supabaseInstance: SupabaseClient | null = null;
@@ -30,6 +12,9 @@ let supabaseInstance: SupabaseClient | null = null;
 export const getSupabase = (): SupabaseClient => {
   if (!supabaseInstance) {
     const key = getSupabaseAnonKey();
+    if (!SUPABASE_URL || !key) {
+      throw new Error('Supabase não configurado: defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env');
+    }
     supabaseInstance = createClient(SUPABASE_URL, key);
   }
   return supabaseInstance;
@@ -40,7 +25,7 @@ export const resetSupabaseClient = () => {
 };
 
 export const isSupabaseConnected = (): boolean => {
-  return !!getSupabaseAnonKey();
+  return !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 };
 
 // ==========================================
