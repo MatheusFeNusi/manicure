@@ -209,7 +209,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                 >
                   {selectedServiceIds.length === 0
                     ? 'Escolha um serviço'
-                    : `${selectedServiceIds.length} serviço${selectedServiceIds.length > 1 ? 's' : ''} • ${formatCurrency(totalAmount)} →`}
+                    : `${selectedServiceIds.length} serviço${selectedServiceIds.length > 1 ? 's' : ''} • ${formatCurrency(totalAmount)}`}
                   <ArrowRight size={16} />
                 </button>
               </div>
