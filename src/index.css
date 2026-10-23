@@ -1383,7 +1383,7 @@ input:focus, select:focus, textarea:focus {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 0.75rem;
 }
 
 .service-badge {
@@ -1408,6 +1408,7 @@ input:focus, select:focus, textarea:focus {
 .service-body {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .service-name {
@@ -1415,6 +1416,9 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.975rem;
   color: var(--text-main);
   margin: 0 0 0.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .service-desc {
@@ -1446,15 +1450,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 .service-image {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: var(--radius-sm);
   object-fit: cover;
   border: 1.5px solid var(--border-color);
   background: var(--surface-alt);
   flex-shrink: 0;
-  margin-left: -0.5rem;
-  margin-right: 0.75rem;
 }
 
 .service-item.selected .service-image {
