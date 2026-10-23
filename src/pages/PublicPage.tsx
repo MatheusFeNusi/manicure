@@ -13,10 +13,8 @@ interface PublicPageProps {
   setIsAdminAuthenticated: (v: boolean) => void;
 }
 
-const SERVICES_KEY = 'bellanail_services_v2';
-
 export const PublicPage: React.FC<PublicPageProps> = ({
-  services: servicesProp,
+  services,
   onAppointmentBooked,
   setIsServiceModalOpen,
   setIsAppointmentModalOpen,
@@ -25,41 +23,14 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const navigate = useNavigate();
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
   const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
-  const [services, setServices] = React.useState<any[]>(servicesProp);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    setServices(servicesProp);
-    setIsLoading(false);
-  }, [servicesProp]);
-
-  React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem(SERVICES_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.length > 0) {
-          setServices(parsed);
-        }
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  React.useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === SERVICES_KEY) {
-        try {
-          const newServices = JSON.parse(e.newValue || '[]');
-          if (newServices && newServices.length > 0) {
-            setServices(newServices);
-          }
-        } catch { /* ignore */ }
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    if (services && services.length > 0) {
+      setIsLoading(false);
+    }
+  }, [services]);
 
   React.useEffect(() => {
     setHasSupabase(isSupabaseConnected());
@@ -77,31 +48,21 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const handleRetry = () => {
     setIsLoading(true);
     setError(null);
-    try {
-      const stored = localStorage.getItem(SERVICES_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && parsed.length > 0) {
-          setServices(parsed);
-          setIsLoading(false);
-          return;
-        }
-      }
-      if (servicesProp && servicesProp.length > 0) {
-        setServices(servicesProp);
+    setTimeout(() => {
+      if (services && services.length > 0) {
+        setIsLoading(false);
       } else {
         setError('Não foi possível carregar os serviços. Tente novamente.');
+        setIsLoading(false);
       }
-    } catch {
-      setError('Não foi possível carregar os serviços. Tente novamente.');
-    } finally {
-      setIsLoading(false);
-    }
+    }, 500);
   };
 
   React.useEffect(() => {
-    handleRetry();
-  }, []);
+    if (!services || services.length === 0) {
+      handleRetry();
+    }
+  }, [services]);
 
   if (isLoading) {
     return (
@@ -127,7 +88,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
     );
   }
 
-  if (error) {
+  if (error || !services || services.length === 0) {
     return (
       <div className="client-page">
         <header className="client-header">
@@ -143,7 +104,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
         </header>
         <main className="client-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-main)', textAlign: 'center', padding: '1rem' }}>
-            <p>{error}</p>
+            <p>{error || 'Nenhum serviço disponível no momento.'}</p>
             <button className="btn btn-primary" onClick={handleRetry}>Tentar novamente</button>
           </div>
         </main>

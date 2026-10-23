@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Sparkles, 
   Calendar, 
@@ -7,6 +7,8 @@ import {
   MessageCircle,
   ArrowLeft,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Service, NailShape, Appointment } from '../types';
@@ -24,6 +26,115 @@ const AVAILABLE_TIMES = [
 const NAIL_SHAPES: NailShape[] = [
   'Almond', 'Quadrada', 'Bailarina', 'Stiletto', 'Redonda', 'Oval'
 ];
+
+const ServicesCarousel: React.FC<{ 
+  services: Service[]; 
+  selectedIds: string[]; 
+  onToggle: (id: string) => void;
+}> = ({ services, selectedIds, onToggle }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+
+  const checkScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setShowLeftArrow(scrollLeft > 10);
+    setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [services.length]);
+
+  const scrollLeftFn = () => {
+    scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' });
+  };
+  const scrollRightFn = () => {
+    scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="services-carousel-wrapper">
+      <div 
+        ref={scrollRef}
+        className="services-carousel"
+        onScroll={checkScroll}
+      >
+        {services.map(srv => {
+          const isSelected = selectedIds.includes(srv.id);
+          return (
+            <div
+              key={srv.id}
+              className={`service-card-carousel ${isSelected ? 'selected' : ''}`}
+              onClick={() => onToggle(srv.id)}
+            >
+              <div className="service-card-inner">
+                {srv.badge === 'Mais Pedido' && (
+                  <div className="service-badge-carousel">
+                    <span className="badge-pill">Mais pedido</span>
+                  </div>
+                )}
+                {srv.imageUrl ? (
+                  <img
+                    className="booking-service-image"
+                    src={srv.imageUrl}
+                    alt={srv.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="service-icon-placeholder">
+                    <Clock size={20} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                  </div>
+                )}
+                <div className="service-card-body">
+                  <h4 className="service-card-name">{srv.name}</h4>
+                  {srv.description && (
+                    <p className="service-card-desc">{srv.description}</p>
+                  )}
+                  <div className="service-card-meta">
+                    <Clock size={12} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                    <span>{srv.durationMinutes} min</span>
+                  </div>
+                </div>
+                <div className="service-card-price">
+                  <span className="service-card-price">{formatCurrency(srv.price)}</span>
+                  {isSelected && (
+                    <span className="service-check">
+                      <Check size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <button 
+        className={`carousel-arrow left ${showLeftArrow ? 'visible' : ''}`}
+        onClick={scrollLeftFn}
+        type="button"
+        aria-label="Serviços anteriores"
+      >
+        <ChevronLeft size={24} strokeWidth={2.5} />
+      </button>
+      <button 
+        className={`carousel-arrow right ${showRightArrow ? 'visible' : ''}`}
+        onClick={scrollRightFn}
+        type="button"
+        aria-label="Próximos serviços"
+      >
+        <ChevronRight size={24} strokeWidth={2.5} />
+      </button>
+    </div>
+  );
+};
 
 export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
   services,
@@ -94,29 +205,6 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
 
   const goBack = () => setStep(step - 1);
 
-  const ServiceIcon = () => (
-    <div className="service-icon-placeholder">
-      <Clock size={20} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-    </div>
-  );
-
-  const ServiceImage = ({ src, alt, onError }: { src: string; alt: string; onError: (e: React.SyntheticEvent<HTMLImageElement>) => void }) => {
-    const [hasError, setHasError] = useState(false);
-    if (hasError) return <ServiceIcon />;
-    return (
-      <img
-        className="booking-service-image"
-        src={src}
-        alt={alt}
-        loading="lazy"
-        onError={(e) => {
-          setHasError(true);
-          onError(e);
-        }}
-      />
-    );
-  };
-
   return (
     <div className="booking-view">
       {isSuccess ? (
@@ -157,57 +245,19 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
         </div>
       ) : (
         <>
-          {/* STEP 1: Escolha dos Procedimentos */}
+          {/* STEP 1: Escolha dos Procedimentos - CARROSSEL */}
           {step === 1 && (
             <div className="step-section">
               <div className="step-head">
                 <h3>Escolha os procedimentos</h3>
-                <p>Você pode selecionar mais de um serviço.</p>
+                <p>Arraste para ver mais. Você pode selecionar mais de um serviço.</p>
               </div>
 
-              <div className="services-grid">
-                {services.map(srv => {
-                  const isSelected = selectedServiceIds.includes(srv.id);
-                  return (
-                    <div
-                      key={srv.id}
-                      className={`service-item ${isSelected ? 'selected' : ''}`}
-                      onClick={() => toggleService(srv.id)}
-                    >
-                      <div className="service-wrap">
-                        {srv.badge === 'Mais Pedido' && (
-                          <div className="service-badge">
-                            <span className="badge-pill">Mais pedido</span>
-                          </div>
-                        )}
-                        {srv.imageUrl ? (
-                          <ServiceImage src={srv.imageUrl} alt={srv.name} onError={() => {}} />
-                        ) : (
-                          <ServiceIcon />
-                        )}
-                        <div className="service-body">
-                          <h4 className="service-name">{srv.name}</h4>
-                          {srv.description && (
-                            <p className="service-desc">{srv.description}</p>
-                          )}
-                          <div className="service-meta">
-                            <Clock size={12} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                            <span>{srv.durationMinutes} min</span>
-                          </div>
-                        </div>
-                        <div className="service-price-col">
-                          <span className="service-price">{formatCurrency(srv.price)}</span>
-                          {isSelected && (
-                            <span className="service-check">
-                              <Check size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ServicesCarousel
+                services={services}
+                selectedIds={selectedServiceIds}
+                onToggle={toggleService}
+              />
 
               <div className="step-actions">
                 <button
