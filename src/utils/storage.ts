@@ -8,7 +8,7 @@ import {
 
 const STORAGE_KEYS = {
   CLIENTS: 'bellanail_clients_v1',
-  SERVICES: 'bellanail_services_v1',
+  SERVICES: 'bellanail_services_v2',
   APPOINTMENTS: 'bellanail_appointments_v1',
   TRANSACTIONS: 'bellanail_transactions_v1',
 };
@@ -28,6 +28,11 @@ export const saveStoredClients = (clients: Client[]) => {
 
 export const getStoredServices = (): Service[] => {
   try {
+    // Limpa versão antiga v1 se existir
+    const oldData = localStorage.getItem('bellanail_services_v1');
+    if (oldData) {
+      localStorage.removeItem('bellanail_services_v1');
+    }
     const data = localStorage.getItem(STORAGE_KEYS.SERVICES);
     return data ? JSON.parse(data) : INITIAL_SERVICES;
   } catch {

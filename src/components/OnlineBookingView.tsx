@@ -100,6 +100,23 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
     </div>
   );
 
+  const ServiceImage = ({ src, alt, onError }: { src: string; alt: string; onError: (e: React.SyntheticEvent<HTMLImageElement>) => void }) => {
+    const [hasError, setHasError] = useState(false);
+    if (hasError) return <ServiceIcon />;
+    return (
+      <img
+        className="booking-service-image"
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onError={(e) => {
+          setHasError(true);
+          onError(e);
+        }}
+      />
+    );
+  };
+
   return (
     <div className="booking-view">
       {isSuccess ? (
@@ -164,16 +181,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                           </div>
                         )}
                         {srv.imageUrl ? (
-                          <img
-                            className="service-image"
-                            src={srv.imageUrl}
-                            alt={srv.name}
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
+                          <ServiceImage src={srv.imageUrl} alt={srv.name} onError={() => {}} />
                         ) : (
                           <ServiceIcon />
                         )}
