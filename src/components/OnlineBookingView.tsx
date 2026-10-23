@@ -7,7 +7,7 @@ import {
   MessageCircle,
   ArrowLeft,
   ArrowRight,
-  Zap
+  Zap,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Service, NailShape, Appointment } from '../types';
@@ -85,7 +85,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
     onAppointmentBooked(newAppointment);
     setIsSuccess(true);
 
-    const waText = `Ol\u00e1, BellaNail Studio! Gostaria de confirmar meu agendamento feito pelo site:\n\n\u2728 *Cliente:* ${clientName}\n\u270d\ufe0f *Procedimento:* ${servicesSummary}\n\uD83D\uDCC5 *Data:* ${formatDateBr(date)}\n\u23F0 *Hor\u00e1rio:* ${time}\n\uD83D\uDCB0 *Valor:* ${formatCurrency(totalAmount)}\n\uD83D\uDC8C *Formato desejado:* ${nailShape}\n\nPodemos confirmar?`;
+    const waText = `Olá, BellaNail Studio! Gostaria de confirmar meu agendamento feito pelo site:\n\n✨ *Cliente:* ${clientName}\n✍️ *Procedimento:* ${servicesSummary}\n📅 *Data:* ${formatDateBr(date)}\n⏰ *Horário:* ${time}\n💰 *Valor:* ${formatCurrency(totalAmount)}\n💌 *Formato desejado:* ${nailShape}\n\nPodemos confirmar?`;
     const waUrl = generateWhatsAppLink('(11) 98765-4321', waText);
     
     setTimeout(() => {
@@ -94,6 +94,12 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
   };
 
   const goBack = () => setStep(step - 1);
+
+  const ServiceIcon = () => (
+    <div className="service-icon-placeholder">
+      <Clock size={20} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </div>
+  );
 
   return (
     <div className="booking-view">
@@ -111,10 +117,10 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
             <div className="summary-label">Resumo da Reserva</div>
             <div className="summary-services">{servicesSummary}</div>
             <div className="summary-meta">
-              <span>\uD83D\uDCC5 {formatDateBr(date)} \u00e0s <strong>{time}</strong></span>
+              <span>📅 {formatDateBr(date)} às <strong>{time}</strong></span>
             </div>
             <div className="summary-meta">
-              <span>\uD83D\uDC8C Formato: <strong>{nailShape}</strong></span>
+              <span>💌 Formato: <strong>{nailShape}</strong></span>
             </div>
             <div className="summary-total">
               Total: {formatCurrency(totalAmount)}
@@ -140,7 +146,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
             <div className="step-section">
               <div className="step-head">
                 <h3>Escolha os procedimentos</h3>
-                <p>Voc\u00ea pode selecionar mais de um servi\u00e7o.</p>
+                <p>Você pode selecionar mais de um serviço.</p>
               </div>
 
               <div className="services-grid">
@@ -152,37 +158,42 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                       className={`service-item ${isSelected ? 'selected' : ''}`}
                       onClick={() => toggleService(srv.id)}
                     >
-                      <div className="service-wrap">
-                        <div className="service-badge">
-                          {srv.badge === 'Mais Pedido' && (
-                            <span className="badge-pill">Mais pedido</span>
-                          )}
-                        </div>
-                        {srv.imageUrl && (
-                          <img
-                            className="service-image"
-                            src={srv.imageUrl}
-                            alt={srv.name}
-                            loading="lazy"
-                          />
+                      <div className="service-badge">
+                        {srv.badge === 'Mais Pedido' && (
+                          <span className="badge-pill">Mais pedido</span>
                         )}
-                        <div className="service-body">
-                          <h4 className="service-name">{srv.name}</h4>
-                          {srv.description && (
-                            <p className="service-desc">{srv.description}</p>
-                          )}
-                          <div className="service-meta">
-                            <span>\u23F1 {srv.durationMinutes} min</span>
-                          </div>
+                      </div>
+                      {srv.imageUrl ? (
+                        <img
+                          className="service-image"
+                          src={srv.imageUrl}
+                          alt={srv.name}
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <ServiceIcon />
+                      )}
+                      <div className="service-body">
+                        <h4 className="service-name">{srv.name}</h4>
+                        {srv.description && (
+                          <p className="service-desc">{srv.description}</p>
+                        )}
+                        <div className="service-meta">
+                          <Clock size={12} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                          <span>{srv.durationMinutes} min</span>
                         </div>
-                        <div className="service-price-col">
-                          <span className="service-price">{formatCurrency(srv.price)}</span>
-                          {isSelected && (
-                            <span className="service-check">
-                              <Zap size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-                            </span>
-                          )}
-                        </div>
+                      </div>
+                      <div className="service-price-col">
+                        <span className="service-price">{formatCurrency(srv.price)}</span>
+                        {isSelected && (
+                          <span className="service-check">
+                            <Zap size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
@@ -195,7 +206,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                   onClick={() => setStep(2)}
                   disabled={selectedServiceIds.length === 0}
                 >
-                  Escolher Data e Hor\u00e1rio <ArrowRight size={16} />
+                  Escolher Data e Horário <ArrowRight size={16} />
                 </button>
               </div>
             </div>
@@ -208,8 +219,8 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                 <button className="btn btn-link btn-back" onClick={goBack}>
                   <ArrowLeft size={14} /> Voltar
                 </button>
-                <h3>Data e Hor\u00e1rio</h3>
-                <p>Hor\u00e1rios para {totalDuration} minutos de atendimento.</p>
+                <h3>Data e Horário</h3>
+                <p>Horários para {totalDuration} minutos de atendimento.</p>
               </div>
 
               <div className="form-field">
@@ -227,7 +238,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
 
               <div className="form-field">
                 <label className="form-label">
-                  <Clock size={16} /> Hor\u00e1rio Dispon\u00edvel
+                  <Clock size={16} /> Horário Disponível
                 </label>
                 <div className="time-grid">
                   {AVAILABLE_TIMES.map(t => {
@@ -262,7 +273,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                   <ArrowLeft size={14} /> Voltar
                 </button>
                 <h3>Seus Dados</h3>
-                <p>Confirma\u00e7\u00e3o direta no seu WhatsApp.</p>
+                <p>Confirmação direta no seu WhatsApp.</p>
               </div>
 
               <div className="form-field">
@@ -308,10 +319,10 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
               </div>
 
               <div className="form-field">
-                <label className="form-label">Observa\u00e7\u00f5es ou inspira\u00e7\u00e3o</label>
+                <label className="form-label">Observações ou inspiração</label>
                 <textarea
                   rows={3}
-                  placeholder="Ex: vermelho cl\u00e1ssico ou francesinha..."
+                  placeholder="Ex: vermelho clássico ou francesinha..."
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   className="field-input field-textarea"
