@@ -158,6 +158,14 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                             <span className="badge-pill">Mais pedido</span>
                           )}
                         </div>
+                        {srv.imageUrl && (
+                          <img
+                            className="service-image"
+                            src={srv.imageUrl}
+                            alt={srv.name}
+                            loading="lazy"
+                          />
+                        )}
                         <div className="service-body">
                           <h4 className="service-name">{srv.name}</h4>
                           {srv.description && (
