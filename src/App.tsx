@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {
   getStoredClients,
@@ -66,8 +66,9 @@ export function App() {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const initialSyncDone = useRef(false);
 
-  // Sync from Supabase on mount ONLY if localStorage is empty (first time setup)
+  // Sync from Supabase on mount - always attempt if connected
   const syncWithSupabase = useCallback(async () => {
     if (!isSupabaseConnected()) {
       setToast({ message: 'Supabase não conectado. Configure em Configurações.', type: 'error' });
@@ -76,10 +77,10 @@ export function App() {
     try {
       const data = await syncFromSupabase();
       if (data) {
-        // Só preencher se o localStorage estiver vazio (primeiro acesso)
-        if (data.services && data.services.length > 0 && services.length === 0) setServices(data.services);
-        if (data.clients && data.clients.length > 0 && clients.length === 0) setClients(data.clients);
-        if (data.appointments && data.appointments.length > 0 && appointments.length === 0) setAppointments(data.appointments);
+        // Se Supabase tem dados, usa eles (sobrescreve mockData)
+        if (data.services && data.services.length > 0) setServices(data.services);
+        if (data.clients && data.clients.length > 0) setClients(data.clients);
+        if (data.appointments && data.appointments.length > 0) setAppointments(data.appointments);
         setToast({ message: 'Dados sincronizados com o banco de dados', type: 'success' });
       } else {
         setToast({ message: 'Nenhum dado encontrado no banco', type: 'error' });
@@ -88,23 +89,26 @@ export function App() {
       setToast({ message: 'Erro ao sincronizar com o banco', type: 'error' });
       console.warn('Erro ao carregar dados do Supabase:', err);
     }
-  }, [services, clients, appointments]);
+  }, []);
 
   useEffect(() => {
-    // Só sincronizar com Supabase se o localStorage estiver vazio
-    if (services.length === 0 && clients.length === 0) {
+    // Sempre tentar sincronizar na primeira montagem se Supabase conectado
+    if (!initialSyncDone.current && isSupabaseConnected()) {
+      initialSyncDone.current = true;
       syncWithSupabase();
     }
-  }, [syncWithSupabase, services, clients]);
+  }, [syncWithSupabase, isSupabaseConnected()]);
 
   // Inscrição em tempo real no Supabase: página do cliente atualiza quando admin edita serviços
   useEffect(() => {
     if (!isSupabaseConnected()) return;
 
     const unsubscribe = subscribeToServiceChanges((newServices) => {
-      setServices(newServices);
-      saveStoredServices(newServices);
-      setToast({ message: 'Serviços atualizados em tempo real', type: 'success' });
+      if (newServices && newServices.length > 0) {
+        setServices(newServices);
+        saveStoredServices(newServices);
+        setToast({ message: 'Serviços atualizados em tempo real', type: 'success' });
+      }
     });
 
     return () => unsubscribe();
@@ -119,9 +123,9 @@ export function App() {
   // Escutar mudanças no localStorage (quando admin salva em outra aba)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'bellanail_services_v1' || e.key === 'bellanail_clients_v1') {
+      if (e.key === 'bellanail_services_v2' || e.key === 'bellanail_clients_v1') {
         try {
-          if (e.key === 'bellanail_services_v1') {
+          if (e.key === 'bellanail_services_v2') {
             setServices(JSON.parse(e.newValue || '[]'));
           }
           if (e.key === 'bellanail_clients_v1') {

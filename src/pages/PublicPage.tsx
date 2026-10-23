@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Clock, MapPin, Star, Lock } from 'lucide-react';
+import { Sparkles, Clock, MapPin, Star, Lock, Loader2 } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
 import { isSupabaseConnected } from '../utils/supabase';
@@ -13,6 +13,8 @@ interface PublicPageProps {
   setIsAdminAuthenticated: (v: boolean) => void;
 }
 
+const SERVICES_KEY = 'bellanail_services_v2';
+
 export const PublicPage: React.FC<PublicPageProps> = ({
   services: servicesProp,
   onAppointmentBooked,
@@ -23,15 +25,18 @@ export const PublicPage: React.FC<PublicPageProps> = ({
   const navigate = useNavigate();
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
   const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
-  const [services, setServices] = React.useState(servicesProp);
+  const [services, setServices] = React.useState<any[]>(servicesProp);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setServices(servicesProp);
+    setIsLoading(false);
   }, [servicesProp]);
 
   React.useEffect(() => {
     try {
-      const stored = localStorage.getItem('bellanail_services_v1');
+      const stored = localStorage.getItem(SERVICES_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && parsed.length > 0) {
@@ -43,7 +48,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
 
   React.useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'bellanail_services_v1') {
+      if (e.key === SERVICES_KEY) {
         try {
           const newServices = JSON.parse(e.newValue || '[]');
           if (newServices && newServices.length > 0) {
@@ -68,6 +73,83 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  const handleRetry = () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const stored = localStorage.getItem(SERVICES_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.length > 0) {
+          setServices(parsed);
+          setIsLoading(false);
+          return;
+        }
+      }
+      if (servicesProp && servicesProp.length > 0) {
+        setServices(servicesProp);
+      } else {
+        setError('Não foi possível carregar os serviços. Tente novamente.');
+      }
+    } catch {
+      setError('Não foi possível carregar os serviços. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    handleRetry();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="client-page">
+        <header className="client-header">
+          <div className="brand">
+            <div className="brand-mark">
+              <Sparkles size={20} strokeWidth={2} />
+            </div>
+            <div className="brand-text">
+              <h1>BellaNail Studio</h1>
+              <p>Manicure & Nail Design</p>
+            </div>
+          </div>
+        </header>
+        <main className="client-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-muted)' }}>
+            <Loader2 size={32} className="animate-spin" style={{ color: 'var(--primary)' }} />
+            <p>Carregando serviços...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="client-page">
+        <header className="client-header">
+          <div className="brand">
+            <div className="brand-mark">
+              <Sparkles size={20} strokeWidth={2} />
+            </div>
+            <div className="brand-text">
+              <h1>BellaNail Studio</h1>
+              <p>Manicure & Nail Design</p>
+            </div>
+          </div>
+        </header>
+        <main className="client-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-main)', textAlign: 'center', padding: '1rem' }}>
+            <p>{error}</p>
+            <button className="btn btn-primary" onClick={handleRetry}>Tentar novamente</button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <>
