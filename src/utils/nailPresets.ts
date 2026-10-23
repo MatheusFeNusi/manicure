@@ -56,15 +56,6 @@ export const NAIL_PHOTO_PRESETS: NailPhotoPreset[] = [
   }
 ];
 
-export const getDefaultServiceImage = (category: string, name: string): string => {
-  const catLower = (category || '').toLowerCase();
-  const nameLower = (name || '').toLowerCase();
-
-  if (nameLower.includes('fibra') || nameLower.includes('alongamento')) return NAIL_PHOTO_PRESETS[0].url;
-  if (nameLower.includes('marsala') || nameLower.includes('gel') || catLower.includes('gel')) return NAIL_PHOTO_PRESETS[1].url;
-  if (nameLower.includes('frances') || nameLower.includes('art') || catLower.includes('art')) return NAIL_PHOTO_PRESETS[3].url;
-  if (nameLower.includes('spa') || nameLower.includes('pés') || nameLower.includes('pedicure') || catLower.includes('spa')) return NAIL_PHOTO_PRESETS[4].url;
-  if (nameLower.includes('blindagem')) return NAIL_PHOTO_PRESETS[6].url;
-  if (nameLower.includes('manuten')) return NAIL_PHOTO_PRESETS[7].url;
-  return NAIL_PHOTO_PRESETS[2].url;
+export const getDefaultServiceImage = (): string | undefined => {
+  return undefined;
 };

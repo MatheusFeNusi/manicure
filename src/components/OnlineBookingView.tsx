@@ -7,7 +7,6 @@ import {
   MessageCircle,
   ArrowLeft,
   ArrowRight,
-  Zap,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Service, NailShape, Appointment } from '../types';
@@ -32,7 +31,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
 }) => {
   const [step, setStep] = useState<number>(1);
 
-  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([services[0]?.id || '']);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('14:30');
   const [clientName, setClientName] = useState('');
@@ -158,42 +157,44 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                       className={`service-item ${isSelected ? 'selected' : ''}`}
                       onClick={() => toggleService(srv.id)}
                     >
-                      <div className="service-badge">
+                      <div className="service-wrap">
                         {srv.badge === 'Mais Pedido' && (
-                          <span className="badge-pill">Mais pedido</span>
+                          <div className="service-badge">
+                            <span className="badge-pill">Mais pedido</span>
+                          </div>
                         )}
-                      </div>
-                      {srv.imageUrl ? (
-                        <img
-                          className="service-image"
-                          src={srv.imageUrl}
-                          alt={srv.name}
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <ServiceIcon />
-                      )}
-                      <div className="service-body">
-                        <h4 className="service-name">{srv.name}</h4>
-                        {srv.description && (
-                          <p className="service-desc">{srv.description}</p>
+                        {srv.imageUrl ? (
+                          <img
+                            className="service-image"
+                            src={srv.imageUrl}
+                            alt={srv.name}
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <ServiceIcon />
                         )}
-                        <div className="service-meta">
-                          <Clock size={12} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                          <span>{srv.durationMinutes} min</span>
+                        <div className="service-body">
+                          <h4 className="service-name">{srv.name}</h4>
+                          {srv.description && (
+                            <p className="service-desc">{srv.description}</p>
+                          )}
+                          <div className="service-meta">
+                            <Clock size={12} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                            <span>{srv.durationMinutes} min</span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="service-price-col">
-                        <span className="service-price">{formatCurrency(srv.price)}</span>
-                        {isSelected && (
-                          <span className="service-check">
-                            <Zap size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-                          </span>
-                        )}
+                        <div className="service-price-col">
+                          <span className="service-price">{formatCurrency(srv.price)}</span>
+                          {isSelected && (
+                            <span className="service-check">
+                              <Check size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -206,7 +207,10 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                   onClick={() => setStep(2)}
                   disabled={selectedServiceIds.length === 0}
                 >
-                  Escolher Data e Horário <ArrowRight size={16} />
+                  {selectedServiceIds.length === 0
+                    ? 'Escolha um serviço'
+                    : `${selectedServiceIds.length} serviço${selectedServiceIds.length > 1 ? 's' : ''} • ${formatCurrency(totalAmount)} →`}
+                  <ArrowRight size={16} />
                 </button>
               </div>
             </div>

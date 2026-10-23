@@ -23,7 +23,6 @@ export const INITIAL_SERVICES: Service[] = [
     price: 110,
     durationMinutes: 90,
     description: 'Nivelamento do crescimento, reposição de fibra, reforço de estrutura e esmaltação.',
-    badge: 'Mais Pedido'
   },
   {
     id: 'srv-3',
