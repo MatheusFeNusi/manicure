@@ -1845,6 +1845,7 @@ input:focus, select:focus, textarea:focus {
   position: relative;
   width: 100%;
   margin-bottom: 1rem;
+  padding: 0 1.5rem;
 }
 
 .services-carousel {
@@ -1853,7 +1854,7 @@ input:focus, select:focus, textarea:focus {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding: 0 1rem;
-  padding: 0.5rem 1rem 1rem;
+  padding: 0.5rem 0.5rem 1.5rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -1871,7 +1872,6 @@ input:focus, select:focus, textarea:focus {
 .service-card-inner {
   display: flex;
   flex-direction: column;
-  height: 100%;
   background: var(--surface);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -1904,7 +1904,7 @@ input:focus, select:focus, textarea:focus {
 .service-card-carousel .booking-service-image,
 .service-card-carousel .service-icon-placeholder {
   width: 100%;
-  height: 200px;
+  height: 160px;
   object-fit: cover;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   border: none;
@@ -1919,17 +1919,12 @@ input:focus, select:focus, textarea:focus {
   color: var(--text-light);
 }
 
-.service-card-inner {
-  padding: 0;
-}
-
 .service-card-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 1rem;
+  gap: 0.5rem;
+  padding: 1rem 1rem 0.75rem;
   flex: 1;
-  min-height: 0;
 }
 
 .service-card-name {
@@ -1943,9 +1938,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .service-card-desc {
-  font-size: 0.78rem;
+  font-size: 0.825rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.5;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1956,10 +1951,9 @@ input:focus, select:focus, textarea:focus {
 .service-card-meta {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
+  gap: 0.35rem;
+  font-size: 0.775rem;
   color: var(--text-light);
-  margin-top: auto;
 }
 
 .service-card-price {
@@ -1974,7 +1968,7 @@ input:focus, select:focus, textarea:focus {
 
 .service-card-price .service-card-price {
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   color: var(--primary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -1989,8 +1983,8 @@ input:focus, select:focus, textarea:focus {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--surface);
   border: 1.5px solid var(--border-color);
@@ -2013,11 +2007,11 @@ input:focus, select:focus, textarea:focus {
 }
 
 .carousel-arrow.left {
-  left: -12px;
+  left: 0;
 }
 
 .carousel-arrow.right {
-  right: -12px;
+  right: 0;
 }
 
 .carousel-arrow.visible {
@@ -2026,8 +2020,21 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (max-width: 768px) {
+  .services-carousel-wrapper {
+    padding: 0 0.5rem;
+  }
+
   .carousel-arrow {
     display: none;
+  }
+
+  .service-card-carousel {
+    width: 260px;
+  }
+
+  .service-card-carousel .booking-service-image,
+  .service-card-carousel .service-icon-placeholder {
+    height: 150px;
   }
 }
 
@@ -2035,10 +2042,6 @@ input:focus, select:focus, textarea:focus {
 @media (min-width: 769px) {
   .service-card-carousel {
     width: 300px;
-  }
-  
-  .services-carousel {
-    scroll-padding: 0 2rem;
   }
 }
 
