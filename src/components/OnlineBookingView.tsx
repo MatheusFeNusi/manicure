@@ -108,7 +108,7 @@ const ServicesCarousel: React.FC<{
                   </div>
                 </div>
                 <div className="service-card-price">
-                  <span className="service-card-price">{formatCurrency(srv.price)}</span>
+                  <span className="service-card-price-value">{formatCurrency(srv.price)}</span>
                   {isSelected && (
                     <span className="service-check">
                       <Check size={14} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />

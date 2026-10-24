@@ -1911,6 +1911,8 @@ input:focus, select:focus, textarea:focus {
   border: none;
   background: var(--surface-alt);
   flex-shrink: 0;
+  max-width: none;
+  max-height: none;
 }
 
 .service-card-body {
@@ -1963,7 +1965,7 @@ input:focus, select:focus, textarea:focus {
   flex-shrink: 0;
 }
 
-.service-card-price .service-card-price {
+.service-card-price-value {
   font-weight: 800;
   font-size: 1.1rem;
   color: var(--primary);
