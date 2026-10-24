@@ -118,7 +118,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
               <Star size={12} fill="#c6922b" color="#c6922b" /> 4.9
             </span>
             <span className="meta-item">
-              <MapPin size={12} /> São Paulo - SP
+              <MapPin size={12} /> São José dos Campos - SP
             </span>
             <span className="meta-item">
               <Clock size={12} /> 09:00 &ndash; 19:00
