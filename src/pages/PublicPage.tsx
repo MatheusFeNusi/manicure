@@ -2,7 +2,6 @@ import React from 'react';
 import { Sparkles, Clock, MapPin, Star, Lock, Loader2 } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
-import { isSupabaseConnected } from '../utils/supabase';
 import { useNavigate } from 'react-router-dom';
 
 interface PublicPageProps {
@@ -22,7 +21,6 @@ export const PublicPage: React.FC<PublicPageProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isLoginModalOpen, setLocalLoginModalOpen] = React.useState(false);
-  const [hasSupabase, setHasSupabase] = React.useState(isSupabaseConnected());
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -31,10 +29,6 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       setIsLoading(false);
     }
   }, [services]);
-
-  React.useEffect(() => {
-    setHasSupabase(isSupabaseConnected());
-  }, []);
 
   const [toast, setToast] = React.useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -151,12 +145,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
           />
         </main>
 
-        {!hasSupabase && (
-          <div className="client-notice">
-            <span>Supabase n&atilde;o conectado.</span>
-            <span>As edi&ccedil;&otilde;es ficam s&oacute; neste navegador.</span>
-          </div>
-        )}
+        
 
         <footer className="client-footer">
           <a
