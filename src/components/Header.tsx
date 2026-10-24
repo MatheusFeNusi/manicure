@@ -1,17 +1,11 @@
 import React from 'react';
-import { Menu, Plus, Calendar, Globe, Database, LogOut, RefreshCw } from 'lucide-react';
+import { Menu, Plus, Calendar } from 'lucide-react';
 import type { ActiveTab } from '../types';
 
 interface HeaderProps {
   activeTab: ActiveTab;
   onOpenMobileMenu: () => void;
   onOpenNewAppointment: () => void;
-  onOpenOnlineBooking: () => void;
-  onOpenSupabaseConfig: () => void;
-  onForceSync: () => void;
-  onLogout: () => void;
-  isSupabaseConnected: boolean;
-  isAdminAuthenticated: boolean;
 }
 
 const TAB_TITLES: Record<ActiveTab, { title: string; subtitle: string }> = {
@@ -44,22 +38,10 @@ const TAB_TITLES: Record<ActiveTab, { title: string; subtitle: string }> = {
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   onOpenMobileMenu,
-  onOpenNewAppointment,
-  onOpenOnlineBooking,
-  onOpenSupabaseConfig,
-  onForceSync,
-  onLogout,
-  isSupabaseConnected,
-  isAdminAuthenticated
+  onOpenNewAppointment
 }) => {
   const currentTab = TAB_TITLES[activeTab] || TAB_TITLES.dashboard;
-  
-  const todayFormatted = new Date().toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
-  });
-
+   
   return (
     <header className="topbar">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -91,69 +73,8 @@ export const Header: React.FC<HeaderProps> = ({
           textTransform: 'capitalize'
         }}>
           <Calendar size={14} color="var(--primary)" />
-          <span>{todayFormatted}</span>
+          <span>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
         </div>
-
-        {/* Supabase Status Button */}
-        <button
-          className="btn btn-secondary"
-          onClick={onOpenSupabaseConfig}
-          style={{
-            fontSize: '0.825rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            border: isSupabaseConnected ? '1px solid #c8e6c9' : '1px solid #ffe0b2',
-            background: isSupabaseConnected ? '#f1f8e9' : '#fff8e1',
-            color: isSupabaseConnected ? '#2e7d32' : '#e65100'
-          }}
-          title="Configurações do Banco Supabase"
-        >
-          <Database size={15} />
-          <span>{isSupabaseConnected ? 'Supabase Conectado' : 'Conectar Supabase'}</span>
-        </button>
-
-        {isSupabaseConnected && (
-          <button
-            className="btn btn-secondary"
-            onClick={onForceSync}
-            style={{
-              fontSize: '0.825rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              border: '1px solid #c8e6c9',
-              background: '#f1f8e9',
-              color: '#2e7d32'
-            }}
-            title="Sincronizar com o Banco de Dados"
-          >
-            <RefreshCw size={15} />
-            <span>Sincronizar Banco</span>
-          </button>
-        )}
-
-        {activeTab !== 'agendamento_online' && (
-          <button
-            className="btn btn-secondary"
-            onClick={onOpenOnlineBooking}
-            style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-          >
-            <Globe size={15} color="var(--primary)" />
-            <span>Página da Cliente</span>
-          </button>
-        )}
-
-        {isAdminAuthenticated && (
-          <button
-            className="btn btn-danger-outline"
-            onClick={onLogout}
-            style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-          >
-            <LogOut size={15} />
-            <span>Sair do Admin</span>
-          </button>
-        )}
 
         <button
           className="btn btn-primary"

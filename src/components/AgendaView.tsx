@@ -20,6 +20,15 @@ interface AgendaViewProps {
   onDeleteAppointment: (id: string) => void;
 }
 
+const STATUS_FILTERS = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'agendado', label: 'Agendados' },
+  { value: 'confirmado', label: 'Confirmados' },
+  { value: 'em_atendimento', label: 'Em Atendimento' },
+  { value: 'concluido', label: 'Concluídos' },
+  { value: 'cancelado', label: 'Cancelados' },
+] as const;
+
 export const AgendaView: React.FC<AgendaViewProps> = ({
   appointments,
   clients,
@@ -29,6 +38,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
   onDeleteAppointment
 }) => {
   const todayStr = new Date().toISOString().split('T')[0];
+  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [statusFilter, setStatusFilter] = useState<string>('todos');
 
@@ -58,122 +68,80 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
 
   return (
     <div className="animate-fade-in">
-      {/* Top Filter and Date Bar */}
-      <div style={{
-        background: 'var(--surface)',
-        padding: '1.25rem 1.5rem',
-        borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow-sm)',
-        marginBottom: '1.5rem',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '1rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CalendarIcon size={18} color="var(--primary)" />
-            <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Data:</span>
-          </div>
+      {/* Top Bar - Mobile Optimized */}
+      <div className="agenda-topbar">
+        <h2 className="agenda-title">Agenda de Atendimentos</h2>
 
-          <div style={{ display: 'flex', gap: '0.35rem' }}>
+        {/* Date Selector Card */}
+        <div className="agenda-date-card">
+          <div className="agenda-date-label">
+            <CalendarIcon size={16} color="var(--primary)" />
+            <span>Data:</span>
+          </div>
+          <div className="agenda-date-options">
             <button
-              className={`filter-pill ${selectedDate === todayStr ? 'active' : ''}`}
+              className={`agenda-date-pill ${selectedDate === todayStr ? 'active' : ''}`}
               onClick={() => setSelectedDate(todayStr)}
             >
               Hoje
             </button>
             <button
-              className={`filter-pill ${
-                selectedDate === new Date(Date.now() + 86400000).toISOString().split('T')[0] ? 'active' : ''
-              }`}
-              onClick={() => {
-                const d = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-                setSelectedDate(d);
-              }}
+              className={`agenda-date-pill ${selectedDate === tomorrowStr ? 'active' : ''}`}
+              onClick={() => setSelectedDate(tomorrowStr)}
             >
               Amanhã
             </button>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="agenda-date-input"
+            />
           </div>
-
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            style={{ width: 'auto', padding: '0.45rem 0.75rem', fontSize: '0.85rem' }}
-          />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Previsto no dia: <strong>{formatCurrency(dayTotalExpected)}</strong>
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#2e7d32', fontWeight: 700 }}>
-              Já recebido: {formatCurrency(dayTotalReceived)}
-            </div>
+        {/* Day Stats */}
+        <div className="agenda-stats">
+          <div className="agenda-stat">
+            <div className="agenda-stat-label">Previsto no dia</div>
+            <div className="agenda-stat-value">{formatCurrency(dayTotalExpected)}</div>
           </div>
-
-          <button className="btn btn-primary" onClick={onOpenNewAppointment}>
-            <Plus size={16} /> Novo Horário
-          </button>
+          <div className="agenda-stat">
+            <div className="agenda-stat-label">Já recebido</div>
+            <div className="agenda-stat-value received">{formatCurrency(dayTotalReceived)}</div>
+          </div>
         </div>
+
+        {/* New Appointment Button - Full Width */}
+        <button className="btn btn-primary agenda-new-btn" onClick={onOpenNewAppointment}>
+          <Plus size={18} /> Novo Horário
+        </button>
       </div>
 
-      {/* Status Filter Tabs */}
-      <div className="filter-bar">
-        <button
-          className={`filter-pill ${statusFilter === 'todos' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('todos')}
-        >
-          Todos ({dayAppointments.length})
-        </button>
-        <button
-          className={`filter-pill ${statusFilter === 'agendado' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('agendado')}
-        >
-          Agendados ({dayAppointments.filter(a => a.status === 'agendado').length})
-        </button>
-        <button
-          className={`filter-pill ${statusFilter === 'confirmado' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('confirmado')}
-        >
-          Confirmados ({dayAppointments.filter(a => a.status === 'confirmado').length})
-        </button>
-        <button
-          className={`filter-pill ${statusFilter === 'em_atendimento' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('em_atendimento')}
-        >
-          Em Atendimento ({dayAppointments.filter(a => a.status === 'em_atendimento').length})
-        </button>
-        <button
-          className={`filter-pill ${statusFilter === 'concluido' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('concluido')}
-        >
-          Concluídos ({dayAppointments.filter(a => a.status === 'concluido').length})
-        </button>
+      {/* Status Filter Tabs - Horizontal Scroll, No Scrollbar */}
+      <div className="agenda-filter-bar">
+        {STATUS_FILTERS.map(filter => {
+          const count = dayAppointments.filter(a => filter.value === 'todos' ? true : a.status === filter.value).length;
+          return (
+            <button
+              key={filter.value}
+              className={`agenda-filter-pill ${statusFilter === filter.value ? 'active' : ''}`}
+              onClick={() => setStatusFilter(filter.value)}
+            >
+              {filter.label} <span className="filter-count">({count})</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Appointment Cards */}
       {filteredAppointments.length === 0 ? (
-        <div className="section-card" style={{ textAlign: 'center', padding: '4rem 1.5rem', color: 'var(--text-muted)' }}>
-          <Clock size={48} style={{ opacity: 0.25, marginBottom: '1rem' }} />
-          <h3>Nenhum agendamento para {formatDateBr(selectedDate)} neste filtro.</h3>
-          <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
-            Você pode agendar um novo horário ou escolher outra data acima.
-          </p>
-          <button 
-            className="btn btn-primary" 
-            style={{ marginTop: '1.25rem' }}
-            onClick={onOpenNewAppointment}
-          >
-            <Plus size={16} /> Agendar Agora
-          </button>
+        <div className="section-card agenda-empty">
+          <Clock size={32} style={{ opacity: 0.25, marginBottom: '0.75rem' }} />
+          <p>Nenhum agendamento para esta data.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {filteredAppointments.map(apt => {
             const client = clients.find(c => c.id === apt.clientId);
             const waReminderText = `Olá, ${apt.clientName}! Passando para confirmar seu horário no Nail Design Shirley Dantas dia ${formatDateBr(apt.date)} às ${apt.time} (${apt.servicesSummary}). Te espero com um café quentinho! Qualquer alteração, avise-me com antecedência. ✨💅`;
@@ -182,13 +150,8 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
             return (
               <div 
                 key={apt.id} 
-                className="section-card"
+                className="section-card agenda-card"
                 style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '1rem',
                   borderLeft: `5px solid ${
                     apt.status === 'concluido' ? '#7b1fa2' :
                     apt.status === 'em_atendimento' ? '#f57f17' :
@@ -198,63 +161,47 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                 }}
               >
                 {/* Time & Duration */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <div className="agenda-card-time">
                   <div className="apt-time-badge" style={{ minWidth: '85px', padding: '0.65rem' }}>
                     <span className="apt-time" style={{ fontSize: '1.2rem' }}>{apt.time}</span>
                     <span className="apt-duration">{apt.durationMinutes} min</span>
                   </div>
+                </div>
 
-                  {/* Client & Service Info */}
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                      <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                        {apt.clientName}
-                      </h4>
-                      {client?.nailShape && (
-                        <span className="badge badge-rose" style={{ fontSize: '0.7rem' }}>
-                          Formato: {client.nailShape}
-                        </span>
-                      )}
-                      <span className={`badge badge-${apt.status}`}>
-                        {apt.status.replace('_', ' ')}
+                {/* Client & Service Info */}
+                <div className="agenda-card-info">
+                  <div className="agenda-card-header">
+                    <h4>{apt.clientName}</h4>
+                    {client?.nailShape && (
+                      <span className="badge badge-rose" style={{ fontSize: '0.7rem' }}>
+                        Formato: {client.nailShape}
                       </span>
-                    </div>
+                    )}
+                    <span className={`badge badge-${apt.status}`}>
+                      {apt.status.replace('_', ' ')}
+                    </span>
+                  </div>
 
-                    <div style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.925rem', marginTop: '0.2rem' }}>
-                      {apt.servicesSummary}
-                    </div>
+                  <div className="agenda-card-service">{apt.servicesSummary}</div>
 
-                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.35rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      <span>WhatsApp: <strong>{apt.clientPhone}</strong></span>
-                      {apt.nailColorPreference && (
-                        <span>Cor: <em>{apt.nailColorPreference}</em></span>
-                      )}
-                      {apt.notes && (
-                        <span>Obs: <em>{apt.notes}</em></span>
-                      )}
-                    </div>
+                  <div className="agenda-card-meta">
+                    <span>WhatsApp: <strong>{apt.clientPhone}</strong></span>
+                    {apt.nailColorPreference && (
+                      <span>Cor: <em>{apt.nailColorPreference}</em></span>
+                    )}
+                    {apt.notes && (
+                      <span>Obs: <em>{apt.notes}</em></span>
+                    )}
                   </div>
                 </div>
 
                 {/* Right side: Amount, Payment & Status Controls */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                      {formatCurrency(apt.totalAmount)}
-                    </div>
+                <div className="agenda-card-actions">
+                  <div className="agenda-card-amount" style={{ textAlign: 'right' }}>
+                    <div className="agenda-card-value">{formatCurrency(apt.totalAmount)}</div>
                     <button
                       onClick={() => onTogglePaymentStatus(apt.id)}
-                      style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        padding: '0.2rem 0.55rem',
-                        borderRadius: '4px',
-                        background: apt.paymentStatus === 'pago' ? '#eef7ed' : '#fff3e0',
-                        color: apt.paymentStatus === 'pago' ? '#2e7d32' : '#e65100',
-                        cursor: 'pointer',
-                        border: 'none',
-                        marginTop: '0.2rem'
-                      }}
+                      className={`agenda-payment-badge ${apt.paymentStatus === 'pago' ? 'paid' : 'pending'}`}
                     >
                       {apt.paymentStatus === 'pago' ? '✓ Pago (' + apt.paymentMethod + ')' : '⏳ Pendente'}
                     </button>
@@ -264,7 +211,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                   <select
                     value={apt.status}
                     onChange={e => handleStatusChange(apt.id, e.target.value as AppointmentStatus)}
-                    style={{ width: 'auto', fontSize: '0.85rem', padding: '0.5rem 0.75rem' }}
+                    className="agenda-status-select"
                   >
                     <option value="agendado">Agendado</option>
                     <option value="confirmado">Confirmado</option>
@@ -278,9 +225,8 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                     href={waLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-whatsapp"
+                    className="btn btn-whatsapp agenda-wa-btn"
                     title="Enviar lembrete e confirmação via WhatsApp"
-                    style={{ padding: '0.55rem 0.85rem' }}
                   >
                     <MessageCircle size={16} />
                     <span>Lembrete</span>
@@ -288,14 +234,13 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
 
                   {/* Delete Button */}
                   <button
-                    className="btn btn-danger-outline"
+                    className="btn btn-danger-outline agenda-delete-btn"
                     onClick={() => {
                       if (confirm(`Excluir agendamento de ${apt.clientName}?`)) {
                         onDeleteAppointment(apt.id);
                       }
                     }}
                     title="Excluir Agendamento"
-                    style={{ padding: '0.55rem' }}
                   >
                     <Trash2 size={16} />
                   </button>

@@ -112,6 +112,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         todayAppointmentsCount={todayAppointmentsCount}
+        isSupabaseConnected={isSupabaseConnected}
+        onOpenOnlineBooking={onOpenOnlineBooking}
+        onOpenSupabaseConfig={onOpenSupabaseConfig}
+        onForceSync={onForceSync}
+        onLogout={onLogout}
+        isAdminAuthenticated={isAdminAuthenticated}
       />
 
       <div className="main-wrapper">
@@ -119,12 +125,6 @@ export const AdminPage: React.FC<AdminPageProps> = ({
           activeTab={activeTab as any}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onOpenNewAppointment={onOpenNewAppointment}
-          onOpenOnlineBooking={onOpenOnlineBooking}
-          onOpenSupabaseConfig={onOpenSupabaseConfig}
-          onForceSync={onForceSync}
-          onLogout={onLogout}
-          isSupabaseConnected={isSupabaseConnected}
-          isAdminAuthenticated={isAdminAuthenticated}
         />
 
         <main className="content-body">

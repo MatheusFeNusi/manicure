@@ -7,7 +7,10 @@ import {
   Wallet, 
   Globe, 
   X,
-  Heart
+  Heart,
+  RefreshCw,
+  Database,
+  LogOut
 } from 'lucide-react';
 import type { ActiveTab } from '../types';
 
@@ -17,6 +20,12 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   todayAppointmentsCount: number;
+  isSupabaseConnected: boolean;
+  onOpenOnlineBooking: () => void;
+  onOpenSupabaseConfig: () => void;
+  onForceSync: () => void;
+  onLogout: () => void;
+  isAdminAuthenticated: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -24,7 +33,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setActiveTab,
   isOpen,
   onClose,
-  todayAppointmentsCount
+  todayAppointmentsCount,
+  isSupabaseConnected,
+  onOpenOnlineBooking,
+  onOpenSupabaseConfig,
+  onForceSync,
+  onLogout,
+  isAdminAuthenticated
 }) => {
   const handleNavClick = (tab: ActiveTab) => {
     setActiveTab(tab);
@@ -114,6 +129,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Globe size={20} />
           <span>Link de Agendamento</span>
         </button>
+
+        {isAdminAuthenticated && (
+          <>
+            <div style={{ margin: '1.25rem 0 0.5rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.85rem' }}>
+              <span style={{ fontSize: '0.725rem', color: 'var(--text-light)', textTransform: 'uppercase', fontWeight: 700, paddingLeft: '1rem', letterSpacing: '0.05em' }}>
+                Configurações
+              </span>
+            </div>
+
+            <button
+              className="nav-item"
+              onClick={onOpenOnlineBooking}
+            >
+              <Globe size={20} />
+              <span>Ver Página da Cliente</span>
+            </button>
+
+            {isSupabaseConnected && (
+              <button
+                className="nav-item"
+                onClick={onForceSync}
+              >
+                <RefreshCw size={20} />
+                <span>Sincronizar Banco</span>
+              </button>
+            )}
+
+            <button
+              className="nav-item"
+              onClick={onOpenSupabaseConfig}
+            >
+              <Database size={20} />
+              <span>Configurar Supabase</span>
+            </button>
+
+            <div style={{ margin: '0.75rem 0 0', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.75rem' }} />
+
+            <button
+              className="nav-item"
+              onClick={onLogout}
+              style={{ color: '#c62828', background: '#ffebee' }}
+            >
+              <LogOut size={20} />
+              <span>Sair do Admin</span>
+            </button>
+          </>
+        )}
       </nav>
 
       <div className="sidebar-footer">
