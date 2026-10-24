@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Clock, MapPin, Star, Lock, Loader2 } from 'lucide-react';
+import { Clock, MapPin, Star, Lock, Loader2 } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
 import { useNavigate } from 'react-router-dom';
@@ -63,11 +63,9 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       <div className="client-page">
         <header className="client-header">
           <div className="brand">
-            <div className="brand-mark">
-              <Sparkles size={20} strokeWidth={2} />
-            </div>
+            <img src="/shrileryimage.png" alt="Shirley Dantas" className="brand-image" />
             <div className="brand-text">
-              <h1>BellaNail Studio</h1>
+              <h1>Nail Design Shirley Dantas</h1>
               <p>Manicure & Nail Design</p>
             </div>
           </div>
@@ -87,11 +85,9 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       <div className="client-page">
         <header className="client-header">
           <div className="brand">
-            <div className="brand-mark">
-              <Sparkles size={20} strokeWidth={2} />
-            </div>
+            <img src="/shrileryimage.png" alt="Shirley Dantas" className="brand-image" />
             <div className="brand-text">
-              <h1>BellaNail Studio</h1>
+              <h1>Nail Design Shirley Dantas</h1>
               <p>Manicure & Nail Design</p>
             </div>
           </div>
@@ -111,11 +107,9 @@ export const PublicPage: React.FC<PublicPageProps> = ({
       <div className="client-page">
         <header className="client-header">
           <div className="brand">
-            <div className="brand-mark">
-              <Sparkles size={20} strokeWidth={2} />
-            </div>
+            <img src="/shrileryimage.png" alt="Shirley Dantas" className="brand-image" />
             <div className="brand-text">
-              <h1>BellaNail Studio</h1>
+              <h1>Nail Design Shirley Dantas</h1>
               <p>Manicure & Nail Design</p>
             </div>
           </div>

@@ -1225,6 +1225,14 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 4px 14px var(--primary-glow);
 }
 
+.brand-image {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+
 .brand-text h1 {
   font-family: var(--font-serif);
   font-size: 1.85rem;
