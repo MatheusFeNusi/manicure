@@ -199,8 +199,8 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
     onAppointmentBooked(newAppointment);
     setIsSuccess(true);
 
-    const waText = `Olá, BellaNail Studio! Gostaria de confirmar meu agendamento feito pelo site:\n\n✨ *Cliente:* ${clientName}\n✍️ *Procedimento:* ${servicesSummary}\n📅 *Data:* ${formatDateBr(date)}\n⏰ *Horário:* ${time}\n💰 *Valor:* ${formatCurrency(totalAmount)}\n💌 *Formato desejado:* ${nailShape}\n\nPodemos confirmar?`;
-    const waUrl = generateWhatsAppLink('(11) 98765-4321', waText);
+    const waText = `Olá, Nail Design Shirley Dantas! Gostaria de confirmar meu agendamento feito pelo site:\n\n✨ *Cliente:* ${clientName}\n✍️ *Procedimento:* ${servicesSummary}\n📅 *Data:* ${formatDateBr(date)}\n⏰ *Horário:* ${time}\n💰 *Valor:* ${formatCurrency(totalAmount)}\n💌 *Formato desejado:* ${nailShape}\n\nPodemos confirmar?`;
+    const waUrl = generateWhatsAppLink('5512981784484', waText);
     
     setTimeout(() => {
       window.open(waUrl, '_blank');
