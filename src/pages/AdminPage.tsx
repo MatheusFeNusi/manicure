@@ -57,6 +57,7 @@ interface AdminPageProps {
   handleDeleteService: (id: string) => Promise<void>;
   handleSaveTransaction: (transaction: any) => void;
   handleDeleteTransaction: (id: string) => void;
+  handleDeleteAppointment: (id: string) => void;
 }
 
 export const AdminPage: React.FC<AdminPageProps> = ({
@@ -101,6 +102,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({
   handleDeleteService,
   handleSaveTransaction,
   handleDeleteTransaction,
+  handleDeleteAppointment,
 }) => {
   return (
     <>
@@ -150,9 +152,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({
               onTogglePaymentStatus={() => {
                 // placeholder - will be wired in App
               }}
-              onDeleteAppointment={() => {
-                // placeholder
-              }}
+              onDeleteAppointment={handleDeleteAppointment}
             />
           )}
 

@@ -19,6 +19,7 @@ import {
   syncDeleteService,
   syncCreateAppointment,
   syncUpdateAppointmentStatus,
+  syncDeleteAppointment,
   syncUpsertTransaction,
   syncDeleteTransaction,
   subscribeToServiceChanges,
@@ -307,6 +308,15 @@ export function App() {
     syncDeleteTransaction(id);
   };
 
+  const handleDeleteAppointment = (id: string) => {
+    setAppointments((prev) => {
+      const updated = prev.filter((a) => a.id !== id);
+      saveStoredAppointments(updated);
+      return updated;
+    });
+    syncDeleteAppointment(id);
+  };
+
   const handleAdminLogout = () => {
     localStorage.removeItem('bellanail_admin_auth');
     setIsAdminAuthenticated(false);
@@ -410,8 +420,9 @@ export function App() {
                   handleSaveAppointment={handleSaveAppointment}
                   handleSaveClient={handleSaveClient}
                   handleDeleteClient={handleDeleteClient}
-                  handleSaveService={handleSaveService}
-                  handleDeleteService={handleDeleteService}
+handleSaveService={handleSaveService}
+                   handleDeleteService={handleDeleteService}
+                   handleDeleteAppointment={handleDeleteAppointment}
                   handleSaveTransaction={handleSaveTransaction}
                   handleDeleteTransaction={handleDeleteTransaction}
                 />
