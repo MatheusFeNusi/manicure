@@ -38,8 +38,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <Sparkles size={24} />
         </div>
         <div className="brand-info">
-          <h1>BellaNail</h1>
-          <p>Studio & Manicure Pro</p>
+          <h1>Shirley Nail Design</h1>
+          <p>Manicure & Nail Art</p>
         </div>
         {isOpen && (
           <button 
@@ -122,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Heart size={18} />
           </div>
           <div className="studio-meta">
-            <h4>Studio BellaNail</h4>
+            <h4>Nail Design Shirley Dantas</h4>
             <p>Atendimento Ativo</p>
           </div>
         </div>

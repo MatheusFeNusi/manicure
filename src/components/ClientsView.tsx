@@ -105,7 +105,7 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
         <div className="clients-grid">
           {filteredClients.map(client => {
             const initial = client.name.charAt(0).toUpperCase();
-            const waGreeting = `Olá, ${client.name}! Como estão suas unhas? Vamos agendar sua próxima manutenção no Studio BellaNail? 💅✨`;
+            const waGreeting = `Olá, ${client.name}! Como estão suas unhas? Vamos agendar sua próxima manutenção no Nail Design Shirley Dantas? 💅✨`;
             const waLink = generateWhatsAppLink(client.phone, waGreeting);
 
             return (

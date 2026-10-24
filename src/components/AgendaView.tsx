@@ -176,7 +176,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filteredAppointments.map(apt => {
             const client = clients.find(c => c.id === apt.clientId);
-            const waReminderText = `Olá, ${apt.clientName}! Passando para confirmar seu horário no Studio BellaNail dia ${formatDateBr(apt.date)} às ${apt.time} (${apt.servicesSummary}). Te espero com um café quentinho! Qualquer alteração, avise-me com antecedência. ✨💅`;
+            const waReminderText = `Olá, ${apt.clientName}! Passando para confirmar seu horário no Nail Design Shirley Dantas dia ${formatDateBr(apt.date)} às ${apt.time} (${apt.servicesSummary}). Te espero com um café quentinho! Qualquer alteração, avise-me com antecedência. ✨💅`;
             const waLink = generateWhatsAppLink(apt.clientPhone, waReminderText);
 
             return (

@@ -48,7 +48,7 @@ export const mapSupabaseService = (row: any): Service => {
     category,
     price: Number(row.preco) || 0,
     durationMinutes: Number(row.duracao_minutos) || 60,
-    description: `Procedimento profissional no Studio BellaNail.`,
+    description: '',
     badge: undefined,
     imageUrl: row.image_url || undefined
   };

@@ -149,7 +149,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           ) : (
             <div>
               {todayAppointments.map(apt => {
-                const message = `Olá, ${apt.clientName}! Passando para confirmar seu horário hoje às ${apt.time} no Studio BellaNail para ${apt.servicesSummary}. Qualquer imprevisto me avise! ✨`;
+                const message = `Olá, ${apt.clientName}! Passando para confirmar seu horário hoje às ${apt.time} no Nail Design Shirley Dantas para ${apt.servicesSummary}. Qualquer imprevisto me avise! ✨`;
                 const waLink = generateWhatsAppLink(apt.clientPhone, message);
 
                 return (

@@ -7,7 +7,7 @@ interface LoginViewProps {
 
 const ADMIN_EMAIL = 'Shirleymanicure2343@gmail.com';
 const ADMIN_PASSWORD = 'manicure0707@#das';
-const STORAGE_KEY = 'bellanail_admin_auth';
+const STORAGE_KEY = 'shirleynail_admin_auth';
 
 export const LoginView: React.FC<LoginViewProps> = ({
   onLogin
@@ -52,7 +52,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </div>
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', margin: 0, fontFamily: 'var(--font-serif)' }}>
-              BellaNail Studio
+              Nail Design Shirley Dantas
             </h1>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, marginTop: '0.2rem' }}>
               Acesso Restrito - Administrador
@@ -85,7 +85,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             </label>
             <input
               type="email"
-              placeholder="admin@bellanail.com"
+              placeholder="admin@shirleynail.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required

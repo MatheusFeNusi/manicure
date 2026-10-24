@@ -20,12 +20,18 @@ interface OnlineBookingViewProps {
 }
 
 const AVAILABLE_TIMES = [
-  '09:00', '10:30', '13:00', '14:30', '16:00', '17:30', '19:00'
+  '09:00', '10:30', '13:00', '14:30', '16:00', '17:30'
 ];
 
 const NAIL_SHAPES: NailShape[] = [
   'Almond', 'Quadrada', 'Bailarina', 'Stiletto', 'Redonda', 'Oval'
 ];
+
+const STEPS = [
+  { number: 1, label: 'Serviços' },
+  { number: 2, label: 'Data e Hora' },
+  { number: 3, label: 'Seus Dados' },
+] as const;
 
 const ServicesCarousel: React.FC<{ 
   services: Service[]; 
@@ -148,12 +154,28 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
 
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState('14:30');
+  const [time, setTime] = useState<string>('');
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [nailShape, setNailShape] = useState<NailShape>('Almond');
   const [notes, setNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Reset time when date changes
+  useEffect(() => {
+    setTime('');
+  }, [date]);
+
+  // Filter available times based on selected date (hide past times for today)
+  const todayStr = new Date().toISOString().split('T')[0];
+  const availableTimes = AVAILABLE_TIMES.filter(t => {
+    if (date !== todayStr) return true;
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const [tHour, tMinute] = t.split(':').map(Number);
+    return tHour > currentHour || (tHour === currentHour && tMinute >= currentMinute);
+  });
 
   const toggleService = (srvId: string) => {
     if (selectedServiceIds.includes(srvId)) {
@@ -249,6 +271,28 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
         </div>
       ) : (
         <>
+          {/* Step Indicator */}
+          <div className="booking-step-indicator">
+            {STEPS.map((_, idx) => {
+              const stepNum = idx + 1;
+              const isCurrent = step === stepNum;
+              const isCompleted = step > stepNum;
+              const isLast = idx === STEPS.length - 1;
+              return (
+                <React.Fragment key={stepNum}>
+                  <div className={`booking-step ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''}`}>
+                    {isCompleted ? (
+                      <Check size={14} strokeWidth={2.5} />
+                    ) : (
+                      <span>{String(stepNum).padStart(2, '0')}</span>
+                    )}
+                  </div>
+                  {!isLast && <div className="booking-step-line" />}
+                </React.Fragment>
+              );
+            })}
+          </div>
+
           {/* STEP 1: Escolha dos Procedimentos - CARROSSEL */}
           {step === 1 && (
             <div className="step-section">
@@ -307,7 +351,7 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                   <Clock size={16} /> Horário Disponível
                 </label>
                 <div className="time-grid">
-                  {AVAILABLE_TIMES.map(t => {
+                  {availableTimes.map(t => {
                     const isSelected = time === t;
                     return (
                       <button
@@ -321,6 +365,11 @@ export const OnlineBookingView: React.FC<OnlineBookingViewProps> = ({
                     );
                   })}
                 </div>
+                {availableTimes.length === 0 && (
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                    Nenhum horário disponível para hoje. Escolha outra data.
+                  </p>
+                )}
               </div>
 
               <div className="step-actions">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, MapPin, Star, Lock, Loader2 } from 'lucide-react';
+import { Clock, MapPin, Phone, Lock, Loader2 } from 'lucide-react';
 import { OnlineBookingView } from '../components/OnlineBookingView';
 import { LoginView } from '../components/LoginView';
 import { useNavigate } from 'react-router-dom';
@@ -115,27 +115,18 @@ export const PublicPage: React.FC<PublicPageProps> = ({
           </div>
           <div className="client-meta">
             <span className="meta-item">
-              <Star size={12} fill="#c6922b" color="#c6922b" /> 4.9
-            </span>
-            <span className="meta-item">
               <MapPin size={12} /> São José dos Campos - SP
             </span>
             <span className="meta-item">
-              <Clock size={12} /> 09:00 &ndash; 19:00
+              <Clock size={12} /> 09:00 &ndash; 18:30
             </span>
             <span className="meta-item">
-              (12) 98178-4484
+              <Phone size={12} /> (12) 98178-4484
             </span>
           </div>
         </header>
 
         <main className="client-main">
-          <div className="client-steps">
-            <div className="step">01</div>
-            <div className="step">02</div>
-            <div className="step">03</div>
-          </div>
-
           <OnlineBookingView
             services={services}
             onAppointmentBooked={onAppointmentBooked}
