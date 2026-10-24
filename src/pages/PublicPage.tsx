@@ -123,6 +123,9 @@ export const PublicPage: React.FC<PublicPageProps> = ({
             <span className="meta-item">
               <Clock size={12} /> 09:00 &ndash; 19:00
             </span>
+            <span className="meta-item">
+              (12) 98178-4484
+            </span>
           </div>
         </header>
 
