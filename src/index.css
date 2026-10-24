@@ -1867,11 +1867,13 @@ input:focus, select:focus, textarea:focus {
   flex: 0 0 auto;
   width: 280px;
   scroll-snap-align: start;
+  min-height: 420px;
 }
 
 .service-card-inner {
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: var(--surface);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -1901,8 +1903,7 @@ input:focus, select:focus, textarea:focus {
   z-index: 2;
 }
 
-.service-card-carousel .booking-service-image,
-.service-card-carousel .service-icon-placeholder {
+.service-card-carousel .booking-service-image {
   width: 100%;
   height: 160px;
   object-fit: cover;
@@ -1912,19 +1913,13 @@ input:focus, select:focus, textarea:focus {
   flex-shrink: 0;
 }
 
-.service-card-carousel .service-icon-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-}
-
 .service-card-body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 1rem 1rem 0.75rem;
   flex: 1;
+  min-height: 0;
 }
 
 .service-card-name {
@@ -1959,11 +1954,13 @@ input:focus, select:focus, textarea:focus {
 .service-card-price {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  width: 100%;
   padding: 0.75rem 1rem;
   border-top: 1px solid var(--border-subtle);
   background: var(--surface-alt);
   border-radius: 0 0 var(--radius-md) var(--radius-md);
+  flex-shrink: 0;
 }
 
 .service-card-price .service-card-price {
@@ -1976,6 +1973,7 @@ input:focus, select:focus, textarea:focus {
 
 .service-check {
   color: var(--primary);
+  margin-left: 0.75rem;
 }
 
 /* Carousel arrows */

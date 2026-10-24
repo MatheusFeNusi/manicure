@@ -85,13 +85,17 @@ const ServicesCarousel: React.FC<{
                     loading="lazy"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
+                      target.src = '/placeholder-service.svg';
+                      target.onerror = null;
                     }}
                   />
                 ) : (
-                  <div className="service-icon-placeholder">
-                    <Clock size={20} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                  </div>
+                  <img
+                    className="booking-service-image"
+                    src="/placeholder-service.svg"
+                    alt={srv.name}
+                    loading="lazy"
+                  />
                 )}
                 <div className="service-card-body">
                   <h4 className="service-card-name">{srv.name}</h4>
